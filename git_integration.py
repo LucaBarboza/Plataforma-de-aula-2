@@ -59,7 +59,7 @@ def salvar_credencial_github(token: str, repo: str, branch: str = "main"):
         return False
 
 def obter_credencial_github():
-    """Recupera as credenciais do GitHub a partir do ambiente, do st.secrets ou do st.session_state."""
+    """Recupera as credenciais do GitHub a partir do ambiente, do st.secrets (incluindo seção [Git]) ou do st.session_state."""
     token = os.environ.get("GITHUB_PAT") or os.environ.get("GITHUB_TOKEN")
     repo = os.environ.get("GITHUB_REPO")
     branch = os.environ.get("GITHUB_BRANCH", "main")
@@ -74,7 +74,7 @@ def obter_credencial_github():
         if branch == "main" and "GITHUB_BRANCH" in st.session_state:
             branch = st.session_state["GITHUB_BRANCH"]
             
-        # 2. Tenta carregar do st.secrets
+        # 2. Tenta carregar do st.secrets raiz
         if not token and "GITHUB_PAT" in st.secrets:
             token = st.secrets["GITHUB_PAT"]
         if not token and "GITHUB_TOKEN" in st.secrets:
@@ -83,10 +83,22 @@ def obter_credencial_github():
             repo = st.secrets["GITHUB_REPO"]
         if branch == "main" and "GITHUB_BRANCH" in st.secrets:
             branch = st.secrets["GITHUB_BRANCH"]
+
+        # 3. Tenta carregar de dentro da seção [Git] do st.secrets (conforme configurado no Streamlit Cloud)
+        if "Git" in st.secrets:
+            git_sec = st.secrets["Git"]
+            if not token and "GITHUB_PAT" in git_sec:
+                token = git_sec["GITHUB_PAT"]
+            if not token and "GITHUB_TOKEN" in git_sec:
+                token = git_sec["GITHUB_TOKEN"]
+            if not repo and "GITHUB_REPO" in git_sec:
+                repo = git_sec["GITHUB_REPO"]
+            if branch == "main" and "GITHUB_BRANCH" in git_sec:
+                branch = git_sec["GITHUB_BRANCH"]
     except Exception:
         pass
         
-    # 3. Se repositório ainda não foi definido, tenta autodetectar a partir do .git/config local
+    # 4. Se repositório ainda não foi definido, tenta autodetectar a partir do .git/config local
     if not repo:
         repo = extrair_repo_git_local()
         
