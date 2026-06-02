@@ -79,7 +79,8 @@ def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_gra
     1. PARCELAMENTO DE TEXTO: Nunca exiba mais de 2 parágrafos corridos seguidos. Quebre a monotonia do texto transformando explicações sequenciais, propriedades ou pressupostos em listas de tópicos (bullet points) limpas.
     2. BLOCOS COLORIDOS DE DESTAQUE: 
        - Use as classes HTML/CSS injetadas no topo do script para envelopar partes do texto.
-       - Fragmentos teóricos muito complexos ou intuições devem entrar dentro de caixas usando os estilos customizados ou os componentes nativos (`st.info()`, `st.warning()`).
+       - Fragmentos teóricos muito complexos ou intuições devem entrar dentro de caixas usando os estilos customizados ou os componentes nativos (`st.info(r"...")`, `st.warning(r"...")`, `st.error(r"...")`, `st.success(r"...")`).
+       - ATENÇÃO: Os componentes `st.info()`, `st.warning()`, `st.error()` e `st.success()` são chamadas de função diretas. É TERMINANTEMENTE PROIBIDO utilizá-los com a palavra-chave 'with' (ex: NUNCA faça 'with st.info(r"..."):'). Use-os apenas como chamadas diretas normais.
     3. CONTAINER PARA EXEMPLOS RESOLVIDOS: Cada exemplo prático da lista DEVE ser isolado visualmente dentro de um `with st.container(border=True):`. Use títulos em markdown bem definidos (ex: "##### 📖 Exemplo Prático: ...") e use `st.success()` ou um bloco destacado para a conclusão/laudo comercial do exemplo.
     4. FORMALISMO MATEMÁTICO: Centralize e destaque todas as equações principais em blocos de `st.latex(r"...")`.
     5. TABELAS E DATAFRAMES ESTILIZADOS (RITMO E ESTRUTURA): Sempre que o JSON contiver dados formatados como tabelas Markdown (ou estruturas comparativas/descritivas de dados), você deve convertê-los e renderizá-los como tabelas Streamlit nativas premium (`st.dataframe` ou `st.table`) criadas dinamicamente com Pandas (`pd.DataFrame`). Nunca exiba dados tabulares estruturados como puro texto corrido sem necessidade.
