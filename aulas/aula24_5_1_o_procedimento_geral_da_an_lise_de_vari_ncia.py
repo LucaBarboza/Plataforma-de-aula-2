@@ -65,7 +65,7 @@ with tab_conteudo:
     st.markdown(r"Ao expandir os termos, o produto cruzado anula-se, resultando na partição clássica:")
     st.latex(r"SQT = \sum n_i(\bar{Y}_{i.} - \bar{Y}_{..})^2 + \sum \sum (Y_{ij} - \bar{Y}_{i.})^2 + 2 \sum \sum (\bar{Y}_{i.} - \bar{Y}_{..})(Y_{ij} - \bar{Y}_{i.})")
     st.markdown(r"Concluímos com a estrutura final da variância observada:")
-    st.latex(r"SQT = SQTrat + SQRes + 0")
+    st.latex(r"SQT = \sum n_i(\bar{Y}_{i.} - \bar{Y}_{..})^2 + \sum \sum (Y_{ij} - \bar{Y}_{i.})^2 + 0")
     
     # Caso Prático
     st.markdown(r"### 📈 Caso de Aplicação: Eficácia de Analgésicos")
@@ -205,23 +205,60 @@ with tab_conteudo:
         name=r'SQ Tratamento',
         x=[r'Partição de Variabilidade'],
         y=[sq_trat],
-        marker_color=r'#1E3A8A'
+        marker_color=PRIMARY_BLUE
     ))
     fig.add_trace(go.Bar(
         name=r'SQ Residual (Erro)',
         x=[r'Partição de Variabilidade'],
         y=[sq_res],
-        marker_color=r'#10B981'
+        marker_color=SECONDARY_GREEN
     ))
     
     fig.update_layout(
-        barmode=r'stack',
-        title=r'Distribuição da Variabilidade Total',
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(fixedrange=True),
+        template="plotly_white",
+        barmode='stack',
+        height=420,
+        margin=dict(l=55, r=30, t=65, b=55, pad=4),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        title=dict(
+            text="<b>Distribuição da Variabilidade Total</b>",
+            font=dict(size=14, color="#1E293B", family="Arial, sans-serif"),
+            x=0.0,
+            y=0.95
+        ),
+        xaxis=dict(
+            title=dict(text="Partição da Variabilidade", font=dict(size=11, color="#1E293B", family="Arial, sans-serif")),
+            tickfont=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            gridcolor="#E2E8F0",
+            zerolinecolor="#CBD5E1",
+            fixedrange=True
+        ),
+        yaxis=dict(
+            title=dict(text="Soma de Quadrados (SQ)", font=dict(size=11, color="#1E293B", family="Arial, sans-serif")),
+            tickfont=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            gridcolor="#E2E8F0",
+            zerolinecolor="#CBD5E1",
+            fixedrange=True
+        ),
         showlegend=True,
-        height=400,
-        margin=dict(l=20, r=20, t=50, b=20)
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1.0,
+            font=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            bgcolor="rgba(255, 255, 255, 0.8)",
+            bordercolor="#E2E8F0",
+            borderwidth=1
+        ),
+        hoverlabel=dict(
+            bgcolor="#FFFFFF",
+            font_size=12,
+            font_color="#1E293B",
+            font_family="Arial, sans-serif"
+        )
     )
     st.plotly_chart(fig, use_container_width=True, key=r"plotly_chart_subtopico_gl")
     
@@ -291,7 +328,7 @@ with tab_conteudo:
     
     st.latex(r"F_{calc} = \frac{SQTrat / (k - 1)}{SQRes / (N - k)}")
     
-    st.markdown(r"A decisão estatística é tomada confrontando o valor calculado com o limiar crítico da distribuição:")
+    st.markdown(r"A decisão estatística é tomada confrontando o valor crítico com o limiar crítico da distribuição:")
     
     st.latex(r"P(F_{calc} > F_{crit; \alpha, k-1, N-k}) = \alpha")
     
@@ -318,14 +355,50 @@ with tab_conteudo:
     fig.add_shape(type="line", x0=f_crit, y0=0, x1=f_crit, y1=max(y), line=dict(color=CRITICAL_RED, dash="dash"))
     
     fig.update_layout(
-        title=r"Distribuição F e Região Crítica ($\alpha=0.05$)",
-        xaxis_title=r"Valor de F",
-        yaxis_title=r"Densidade",
         template="plotly_white",
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(fixedrange=True)
+        height=420,
+        margin=dict(l=55, r=30, t=65, b=55, pad=4),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        title=dict(
+            text="<b>Distribuição F e Região Crítica (α = 0.05)</b>",
+            font=dict(size=14, color="#1E293B", family="Arial, sans-serif"),
+            x=0.0,
+            y=0.95
+        ),
+        xaxis=dict(
+            title=dict(text="Valor de F", font=dict(size=11, color="#1E293B", family="Arial, sans-serif")),
+            tickfont=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            gridcolor="#E2E8F0",
+            zerolinecolor="#CBD5E1",
+            fixedrange=True
+        ),
+        yaxis=dict(
+            title=dict(text="Densidade", font=dict(size=11, color="#1E293B", family="Arial, sans-serif")),
+            tickfont=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            gridcolor="#E2E8F0",
+            zerolinecolor="#CBD5E1",
+            fixedrange=True
+        ),
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1.0,
+            font=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            bgcolor="rgba(255, 255, 255, 0.8)",
+            bordercolor="#E2E8F0",
+            borderwidth=1
+        ),
+        hoverlabel=dict(
+            bgcolor="#FFFFFF",
+            font_size=12,
+            font_color="#1E293B",
+            font_family="Arial, sans-serif"
+        )
     )
-    
     st.plotly_chart(fig, use_container_width=True, key=r"plotly_chart_subtopico_4")
     
     st.subheader(r"📈 Casos de Aplicação Prática: Análise de Semicondutores")
@@ -352,7 +425,6 @@ with tab_conteudo:
 with tab_exercicios:
     import json
     dados_exercicios = json.loads(r"""{"topico_aula": "5.1 – O procedimento geral da análise de variância (ANOVA)", "questoes_multipla_escolha": [{"enunciado": "Em um estudo clínico para avaliar a eficácia de quatro novos fármacos neurotrópicos na redução da latência de disparo neural, um pesquisador decide comparar as médias dos tempos de resposta entre os quatro grupos utilizando múltiplos testes t de Student para cada par de grupos (ex: Drug 1 vs. Drug 2, Drug 1 vs. Drug 3, etc.). Considerando o rigor estatístico, qual é a principal falha procedimental deste pesquisador ao não utilizar a ANOVA?", "alternativas": {"A": "O teste t de Student não possui poder estatístico suficiente para comparar médias de diferentes grupos experimentais, independentemente da quantidade de grupos.", "B": "A utilização de múltiplos testes t de Student inflaciona severamente o Erro Tipo I (probabilidade de detectar uma diferença falsa onde não existe), devido ao problema da taxa de erro familiar (family-wise error rate).", "C": "O modelo ANOVA exige necessariamente que os dados sigam uma distribuição de Poisson, enquanto o teste t exige normalidade, tornando a comparação matematicamente incompatível.", "D": "O teste t de Student é restrito a amostras com tamanho $n < 30$, sendo a ANOVA a única técnica capaz de lidar com amostras grandes.", "E": "A ANOVA é, na verdade, uma simplificação do teste t de Student, e não existe diferença procedimental entre os dois métodos para mais de dois grupos."}, "alternativa_correta": "B", "dica": "Reflita sobre o que acontece com a probabilidade acumulada de rejeitar a hipótese nula quando você realiza vários testes sucessivos de comparação de médias ao nível $\\alpha$.", "gabarito_comentado": "A utilização de múltiplos testes t de Student para comparar $k$ grupos resulta na inflação do Erro Tipo I. Se cada teste é realizado com um nível de significância $\\alpha = 0,05$, a probabilidade de cometer pelo menos um Erro Tipo I ao realizar múltiplos testes cresce exponencialmente. A ANOVA corrige isso ao avaliar todas as médias simultaneamente sob a hipótese $H_0: \\alpha_1 = \\alpha_2 = \\dots = \\alpha_k = 0$, mantendo a taxa de erro global sob controle."}, {"enunciado": "Considere que, na decomposição da variabilidade total de um experimento sobre o efeito de diferentes dietas na plasticidade sináptica, observou-se que a $SQTrat$ é muito próxima de zero e a $SQRes$ é elevada. Qual conclusão estatística é mais provável para a estatística $F_{\\text{calc}}$ e a decisão sobre a hipótese nula?", "alternativas": {"A": "A estatística $F_{\\text{calc}}$ será muito alta, levando à rejeição de $H_0$ e indicando que os efeitos dos tratamentos são altamente significativos.", "B": "A estatística $F_{\\text{calc}}$ será aproximadamente 1, indicando que o tratamento explica a maior parte da variabilidade dos dados.", "C": "A estatística $F_{\\text{calc}}$ será muito baixa (próxima de zero), indicando que a variabilidade entre grupos é desprezível comparada ao ruído residual, sugerindo a não rejeição de $H_0$.", "D": "O valor de $F_{\\text{calc}}$ será negativo, o que é matematicamente impossível, indicando erro na coleta dos dados experimentais.", "E": "A estatística $F_{\\text{calc}}$ será igual à $SQTot$, o que invalida o teste de hipótese realizado."}, "alternativa_correta": "C", "dica": "Lembre-se que $F_{\\text{calc}} = \\frac{QMTrat}{QMRes}$. Se o numerador é quase zero e o denominador é grande, qual o comportamento da razão?", "gabarito_comentado": "A estatística $F_{\\text{calc}}$ é a razão entre o Quadrado Médio do Tratamento ($QMTrat$) e o Quadrado Médio do Erro ($QMRes$). Se a $SQTrat$ é próxima de zero, significa que as médias dos grupos são muito semelhantes entre si e próximas da média global ($\\bar{Y}_{..}$). Com um $QMRes$ elevado (muito ruído), a razão $QMTrat / QMRes$ tende a zero. Valores de $F_{\\text{calc}}$ próximos de zero indicam que não há evidência suficiente para rejeitar a hipótese nula de que as médias são iguais."}, {"enunciado": "Em uma análise de variância de um experimento com $k=3$ grupos e $n=10$ observações por grupo, o número total de observações é $N=30$. Quais são os graus de liberdade associados ao numerador ($gl_{\\text{num}}$) e ao denominador ($gl_{\\text{den}}$) para a estatística $F_{\\text{calc}}$?", "alternativas": {"A": "$gl_{\\text{num}} = 3$ e $gl_{\\text{den}} = 30$.", "B": "$gl_{\\text{num}} = 2$ e $gl_{\\text{den}} = 27$.", "C": "$gl_{\\text{num}} = 29$ e $gl_{\\text{den}} = 3$.", "D": "$gl_{\\text{num}} = 30$ e $gl_{\\text{den}} = 2$.", "E": "$gl_{\\text{num}} = 10$ e $gl_{\\text{den}} = 20$."}, "alternativa_correta": "B", "dica": "Verifique a definição de graus de liberdade na teoria: $gl_{\\text{num}} = k - 1$ e $gl_{\\text{den}} = N - k$.", "gabarito_comentado": "Aplicando as fórmulas fornecidas na teoria: $gl_{\\text{num}} = k - 1$. Como temos $k=3$ grupos, $gl_{\\text{num}} = 3 - 1 = 2$. Para o denominador, usamos $gl_{\\text{den}} = N - k$. Com $N=30$ e $k=3$, temos $gl_{\\text{den}} = 30 - 3 = 27$. Portanto, a distribuição $F$ utilizada para o teste terá parâmetros $(2, 27)$."}, {"enunciado": "Qual das seguintes suposições é fundamental para a validade do procedimento de ANOVA descrito no modelo $Y_{ij} = \\mu + \\alpha_i + \\epsilon_{ij}$?", "alternativas": {"A": "Os erros aleatórios $\\epsilon_{ij}$ devem seguir uma distribuição não-paramétrica qualquer.", "B": "A variância do erro $\\sigma^2$ deve variar proporcionalmente entre os grupos, conforme aumenta a média do grupo.", "C": "Os erros aleatórios $\\epsilon_{ij}$ devem ser independentes, identicamente distribuídos e seguir uma distribuição normal $N(0, \\sigma^2)$.", "D": "O efeito do tratamento $\\alpha_i$ deve ser sempre positivo para garantir a estabilidade da variância.", "E": "A média global $\\mu$ deve ser igual a zero para que o teste $F$ seja válido."}, "alternativa_correta": "C", "dica": "Releia a seção sobre o formalismo do termo de erro $\\epsilon_{ij}$ no modelo linear.", "gabarito_comentado": "O modelo linear de efeitos fixos assume que os erros $\\epsilon_{ij}$ são independentes, têm média zero, variância constante $\\sigma^2$ (homocedasticidade) e seguem uma distribuição normal. Essas premissas garantem que a estatística $F_{\\text{calc}}$ siga exatamente a distribuição $F$ de Snedecor sob a hipótese nula."}, {"enunciado": "No contexto da ANOVA, o que representa a Soma de Quadrados dos Tratamentos ($SQTrat$)?", "alternativas": {"A": "A variabilidade total observada entre todas as unidades experimentais independentemente do grupo.", "B": "A variação inerente de cada observação em relação à média do seu próprio grupo, representando o ruído experimental.", "C": "A dispersão das médias dos grupos em relação à média global, capturando o efeito sistemático dos tratamentos.", "D": "O valor quadrático da média aritmética de todas as observações do experimento.", "E": "A diferença entre o maior valor observado e o menor valor observado em todo o conjunto de dados."}, "alternativa_correta": "C", "dica": "Pense em termos de 'sinal vs ruído'. O que a ANOVA tenta isolar quando compara grupos?", "gabarito_comentado": "A $SQTrat$ (ou soma de quadrados entre grupos) quantifica o quanto as médias dos grupos ($\\bar{Y}_{i.}$) desviam-se da média global ($\\bar{Y}_{..}$). É a componente que reflete o 'sinal' ou o efeito dos níveis do fator. Se esta componente for grande, as médias dos grupos são distantes entre si, o que é evidência contra a hipótese de igualdade de médias."}], "questoes_discursivas": [{"enunciado": "Considere um experimento neurocientífico onde três regiões do hipocampo (Grupos A, B e C) tiveram a expressão de uma proteína medida. Os dados (em unidades arbitrárias) são: Grupo A: {10, 12, 11}; Grupo B: {15, 17, 16}; Grupo C: {11, 13, 12}. Calcule a Média Global ($\\bar{Y}_{..}$), a $SQTrat$ e a $SQRes$.", "dica": "Lembre-se de calcular primeiro a média de cada grupo e depois a média de todas as observações (média global).", "gabarito_passo_a_passo": ["Passo 1: Calcular médias dos grupos. $\\bar{Y}_{A} = (10+12+11)/3 = 11$; $\\bar{Y}_{B} = (15+17+16)/3 = 16$; $\\bar{Y}_{C} = (11+13+12)/3 = 12$.", "Passo 2: Calcular a Média Global $\\bar{Y}_{..} = (11+16+12)/3 = 13$.", "Passo 3: Calcular $SQTrat = n \\sum (\\bar{Y}_{i.} - \\bar{Y}_{..})^2$. Aqui $n=3$. $SQTrat = 3 * [(11-13)^2 + (16-13)^2 + (12-13)^2] = 3 * [4 + 9 + 1] = 3 * 14 = 42$.", "Passo 4: Calcular $SQRes = \\sum (Y_{ij} - \\bar{Y}_{i.})^2$. Grupo A: $(10-11)^2 + (12-11)^2 + (11-11)^2 = 1+1+0 = 2$. Grupo B: $(15-16)^2 + (17-16)^2 + (16-16)^2 = 1+1+0 = 2$. Grupo C: $(11-12)^2 + (13-12)^2 + (12-12)^2 = 1+1+0 = 2$.", "Passo 5: $SQRes = 2 + 2 + 2 = 6$."]}, {"enunciado": "Explique, do ponto de vista do formalismo matemático da ANOVA, por que a variância é decomposta em 'Tratamento' e 'Resíduo'. Como essa decomposição afeta a construção do teste $F$?", "dica": "Considere a identidade algébrica $SQTot = SQTrat + SQRes$ e a natureza dos estimadores de variância.", "gabarito_passo_a_passo": ["Passo 1: A identidade $SQTot = SQTrat + SQRes$ deriva da partição dos desvios de cada observação: $(Y_{ij} - \\bar{Y}_{..}) = (Y_{ij} - \\bar{Y}_{i.}) + (\\bar{Y}_{i.} - \\bar{Y}_{..})$.", "Passo 2: Ao elevar ao quadrado e somar, os termos cruzados se anulam (ortogonalidade), restando a soma das somas dos quadrados.", "Passo 3: O termo $SQTrat$ capta a variação sistemática (efeito dos fatores). O termo $SQRes$ capta a variação aleatória (ruído).", "Passo 4: Construímos $QMTrat = SQTrat / (k-1)$ e $QMRes = SQRes / (N-k)$, que são estimadores da variância populacional $\\sigma^2$ sob a hipótese nula.", "Passo 5: A estatística $F = QMTrat / QMRes$ compara esses dois estimadores. Se $H_0$ é falsa, $QMTrat$ infla devido aos efeitos reais $\\alpha_i$, tornando $F$ grande e levando à rejeição de $H_0$."]}, {"enunciado": "Você possui um output de uma ANOVA com os seguintes dados: $N=20$ observações totais, $k=4$ grupos, $SQTot = 100$ e $SQRes = 40$. Calcule o valor da estatística $F_{\\text{calc}}$ e determine os graus de liberdade.", "dica": "Utilize a relação $SQTot = SQTrat + SQRes$ para encontrar $SQTrat$ antes de calcular os Quadrados Médios.", "gabarito_passo_a_passo": ["Passo 1: Identificar os componentes: $N=20$, $k=4$.", "Passo 2: Calcular $SQTrat = SQTot - SQRes = 100 - 40 = 60$.", "Passo 3: Calcular os Graus de Liberdade: $gl_{\\text{num}} = k - 1 = 4 - 1 = 3$. $gl_{\\text{den}} = N - k = 20 - 4 = 16$.", "Passo 4: Calcular Quadrados Médios: $QMTrat = SQTrat / gl_{\\text{num}} = 60 / 3 = 20$. $QMRes = SQRes / gl_{\\text{den}} = 40 / 16 = 2.5$.", "Passo 5: Calcular $F_{\\text{calc}} = QMTrat / QMRes = 20 / 2.5 = 8.0$."]}]}""")
-
 
     st.header("Exercícios de Fixação")
     

@@ -16,6 +16,117 @@ def substituir_simbolo(md_content, conceito, novo_simbolo):
     md_content = re.sub(padrao, rf"\1 {novo_simbolo_escapado} \2", md_content)
     return md_content
 
+def construir_relatorio_prosa_txt(exec_log, teoria_gigante_path, exercicios_path):
+    """
+    Constrói um relatório descritivo completo em formato TXT contendo todo o passo a passo,
+    conteúdos intermediários, prosa expandida e exercícios da geração.
+    """
+    relatorio = []
+    relatorio.append("======================================================================")
+    relatorio.append("       RELATÓRIO DE AUDITORIA E HISTÓRICO COMPLETO DA AULA")
+    relatorio.append("======================================================================")
+    relatorio.append(f"Tema Global: {exec_log.get('tema', 'N/A')}")
+    relatorio.append(f"Professor: {exec_log.get('professor', 'N/A')}")
+    relatorio.append(f"Disciplina: {exec_log.get('disciplina', 'N/A')}")
+    relatorio.append(f"Início da Geração: {exec_log.get('timestamp_inicio', 'N/A')}")
+    relatorio.append(f"Fim da Geração: {exec_log.get('timestamp_fim', 'N/A')}")
+    relatorio.append(f"Tempo Total: {exec_log.get('tempo_total_segundos', 0.0)} segundos")
+    relatorio.append(f"Status Final: {exec_log.get('status', 'N/A').upper()}")
+    relatorio.append("======================================================================\n")
+    
+    # 1. Roteiro e Cronograma
+    relatorio.append("----------------------------------------------------------------------")
+    relatorio.append("1. CRONOGRAMA E MÉTRICAS DAS ETAPAS DE DESENVOLVIMENTO")
+    relatorio.append("----------------------------------------------------------------------")
+    etapas = exec_log.get("etapas", {})
+    for chave in sorted(etapas.keys()):
+        et = etapas[chave]
+        relatorio.append(f"- {et.get('descricao', 'Etapa')}:")
+        relatorio.append(f"  * Status: {et.get('status', 'N/A')}")
+        relatorio.append(f"  * Duração: {et.get('duracao_segundos', 0.0)} segundos")
+    relatorio.append("\n")
+    
+    # 2. Conteúdo de Prosa por Subtópico
+    if os.path.exists(teoria_gigante_path):
+        try:
+            with open(teoria_gigante_path, "r", encoding="utf-8") as f:
+                teoria = json.load(f)
+                
+            relatorio.append("----------------------------------------------------------------------")
+            relatorio.append("2. HISTÓRICO DE PRODUÇÃO DOS CONTEÚDOS E PROSA EXPANDIDA")
+            relatorio.append("----------------------------------------------------------------------")
+            
+            subtopicos_log = etapas.get("3_escrita_revisao", {}).get("subtopicos", [])
+            subtopicos_dict = {sub.get("titulo", ""): sub for sub in subtopicos_log}
+            
+            for idx, pagina in enumerate(teoria.get("paginas_conteudo", [])):
+                titulo = pagina.get("titulo_subtopico", "Subtópico")
+                relatorio.append(f"\n[Subtópico {idx+1}]: {titulo}")
+                relatorio.append("-" * 40)
+                
+                # Exibe métricas de auditoria do revisor para este subtópico se existirem
+                sub_info = subtopicos_dict.get(titulo)
+                if sub_info:
+                    relatorio.append(f"  * Auditoria do Revisor Científico:")
+                    relatorio.append(f"    - Tentativas do Escritor: {sub_info.get('tentativas', 1)}")
+                    relatorio.append(f"    - Reprovações do Revisor: {sub_info.get('reprovacoes', 0)}")
+                    feedbacks = sub_info.get("feedbacks", [])
+                    if feedbacks:
+                        relatorio.append("    - Histórico de Feedbacks de Correção:")
+                        for f_idx, fb in enumerate(feedbacks):
+                            relatorio.append(f"      [Tentativa #{f_idx+1}] {fb}")
+                
+                relatorio.append("\n>>> A) PROSA BASE GERADA:")
+                relatorio.append(pagina.get("discussao_teorica_prosa", "N/A"))
+                relatorio.append("\n>>> B) FORMALISMO MATEMÁTICO (LaTeX):")
+                relatorio.append(pagina.get("formalismo_latex", "N/A"))
+                relatorio.append("\n>>> C) PROSA EXPANDIDA FINAL DE LIVRO DIDÁTICO:")
+                relatorio.append(pagina.get("prosa_longa_expandida", "N/A"))
+                relatorio.append("\n" + "=" * 40)
+        except Exception as e:
+            relatorio.append(f"[ERRO] Falha ao ler teoria para o relatório: {e}")
+    else:
+        relatorio.append("[AVISO] Arquivo de teoria não encontrado para detalhamento do conteúdo.")
+        
+    relatorio.append("\n")
+    
+    # 3. Exercícios Resolvidos
+    if os.path.exists(exercicios_path):
+        try:
+            with open(exercicios_path, "r", encoding="utf-8") as f:
+                exs = json.load(f)
+                
+            relatorio.append("----------------------------------------------------------------------")
+            relatorio.append("3. CADERNO DE EXERCÍCIOS GERADO")
+            relatorio.append("----------------------------------------------------------------------")
+            
+            relatorio.append("\n>>> A) QUESTÕES DE MÚLTIPLA ESCOLHA:")
+            for q_idx, q in enumerate(exs.get("questoes_multipla_escolha", [])):
+                relatorio.append(f"\nQuestão {q_idx+1}: {q.get('enunciado', 'N/A')}")
+                for alt, texto in q.get("alternativas", {}).items():
+                    relatorio.append(f"  {alt}) {texto}")
+                relatorio.append(f"  * Dica: {q.get('dica', 'N/A')}")
+                relatorio.append(f"  * Gabarito Correto: {q.get('alternativa_correta', 'N/A')}")
+                relatorio.append(f"  * Justificativa: {q.get('gabarito_comentado', 'N/A')}")
+                
+            relatorio.append("\n>>> B) QUESTÕES DISCURSIVAS ABERTAS:")
+            for q_idx, q in enumerate(exs.get("questoes_discursivas", [])):
+                relatorio.append(f"\nQuestão {q_idx+1}: {q.get('enunciado', 'N/A')}")
+                relatorio.append(f"  * Dica: {q.get('dica', 'N/A')}")
+                relatorio.append("  * Resolução Passo a Passo:")
+                for p_idx, passo in enumerate(q.get("gabarito_passo_a_passo", [])):
+                    relatorio.append(f"    {p_idx+1}. {passo}")
+        except Exception as e:
+            relatorio.append(f"[ERRO] Falha ao ler exercícios para o relatório: {e}")
+    else:
+        relatorio.append("[AVISO] Arquivo de exercícios não encontrado para detalhamento.")
+        
+    relatorio.append("\n======================================================================")
+    relatorio.append("                         FIM DO RELATÓRIO")
+    relatorio.append("======================================================================")
+    
+    return "\n".join(relatorio)
+
 def run_page():
     # Garante a carga da chave de API
     carregar_chave_api()
@@ -508,7 +619,7 @@ def run_page():
             from gerador_interface import compilar_aula_completa_por_fatias
             
             t_start_interface = time.time()
-            caminho_script_gerado = compilar_aula_completa_por_fatias(os.path.join("cache", "payload_teoria_gigante.json"), os.path.join("cache", "payload_exercicios.json"), motor_grafico="plotly")
+            caminho_script_gerado = compilar_aula_completa_por_fatias(os.path.join("cache", "payload_teoria_gigante.json"), os.path.join("cache", "payload_exercicios.json"), motor_grafico="plotly", cor_principal=cor_principal, cor_critica=cor_critica)
             t_end_interface = time.time()
             
             status_box.write("✅ Arquivo Python executável gerado fisicamente na pasta `/aulas`!")
@@ -532,15 +643,33 @@ def run_page():
 
             # Salva o log específico associado à aula para persistência no repositório
             if caminho_script_gerado:
-                caminho_log_especifico = caminho_script_gerado.replace(".py", ".log.json")
+                nome_script = os.path.basename(caminho_script_gerado)
+                os.makedirs("logdasaulasgeradas", exist_ok=True)
+                caminho_log_especifico = os.path.join("logdasaulasgeradas", nome_script.replace(".py", ".log.json"))
+                caminho_log_txt = os.path.join("logdasaulasgeradas", nome_script.replace(".py", ".log.txt"))
+                
                 try:
                     with open(caminho_log_especifico, "w", encoding="utf-8") as f:
                         json.dump(exec_log, f, indent=4, ensure_ascii=False)
                     status_box.write(f"✅ Relatório de auditoria persistido em '{caminho_log_especifico}'!")
                 except Exception as log_ex:
-                    status_box.write(f"⚠️ Aviso: Não foi possível salvar o log da aula: {log_ex}")
+                    status_box.write(f"⚠️ Aviso: Não foi possível salvar o log JSON da aula: {log_ex}")
+                
+                try:
+                    teoria_gigante_path = os.path.join("cache", "payload_teoria_gigante.json")
+                    exercicios_path = os.path.join("cache", "payload_exercicios.json")
+                    relatorio_txt = construir_relatorio_prosa_txt(exec_log, teoria_gigante_path, exercicios_path)
+                    
+                    with open(caminho_log_txt, "w", encoding="utf-8") as f:
+                        f.write(relatorio_txt)
+                    status_box.write(f"✅ Relatório descritivo persistido em '{caminho_log_txt}'!")
+                except Exception as txt_ex:
+                    status_box.write(f"⚠️ Aviso: Não foi possível criar o relatório descritivo txt da aula: {txt_ex}")
 
-                # Envia os arquivos gerados (.py e .log.json) ao repositório do GitHub
+                # Envia os arquivos gerados (.py, .log.json e .log.txt) ao repositório do GitHub
+                sucesso_py = False
+                sucesso_log = False
+                sucesso_txt = False
                 try:
                     from git_integration import commitar_arquivo_github
                     
@@ -555,23 +684,38 @@ def run_page():
                     )
                     
                     nome_arquivo_log = os.path.basename(caminho_log_especifico)
-                    caminho_repositorio_log = f"aulas/{nome_arquivo_log}"
+                    caminho_repositorio_log = f"logdasaulasgeradas/{nome_arquivo_log}"
                     sucesso_log = commitar_arquivo_github(
                         caminho_local=caminho_log_especifico,
                         caminho_repositorio=caminho_repositorio_log,
-                        mensagem_commit=f"feat: adiciona log {caminho_repositorio_log}"
+                        mensagem_commit=f"feat: adiciona log json {caminho_repositorio_log}"
                     )
                     
-                    if sucesso_py and sucesso_log:
+                    nome_arquivo_txt = os.path.basename(caminho_log_txt)
+                    caminho_repositorio_txt = f"logdasaulasgeradas/{nome_arquivo_txt}"
+                    sucesso_txt = commitar_arquivo_github(
+                        caminho_local=caminho_log_txt,
+                        caminho_repositorio=caminho_repositorio_txt,
+                        mensagem_commit=f"feat: adiciona log descritivo txt {caminho_repositorio_txt}"
+                    )
+                    
+                    if sucesso_py and sucesso_log and sucesso_txt:
                         status_box.write("✅ Sucesso! Arquivos salvos permanentemente no seu GitHub.")
                     else:
-                        status_box.write("⚠️ Aviso: Arquivos gerados localmente, mas não enviados ao GitHub (verifique GITHUB_PAT/GITHUB_REPO nos Secrets).")
+                        status_box.write("⚠️ Aviso: Arquivos gerados localmente, mas nem todos enviados ao GitHub.")
                 except Exception as git_ex:
                     status_box.write(f"⚠️ Erro ao tentar salvar no GitHub: {git_ex}")
 
             status_box.update(label="🎉 Aula Acadêmica Gerada e Compilada com Sucesso!", state="complete")
             st.balloons()
-            st.success("✨ A geração foi concluída perfeitamente! O menu de trilha de aprendizagem foi atualizado.")
+            
+            # Alerta explícito de salvamento no Git (solicitado pelo usuário)
+            if sucesso_py and sucesso_log and sucesso_txt:
+                st.success("✨ A geração foi concluída perfeitamente! Os arquivos da aula, do log JSON e do relatório TXT foram **salvos com sucesso no seu GitHub**.")
+            elif sucesso_py:
+                st.success("✨ A geração foi concluída perfeitamente! A aula foi salva no GitHub, mas alguns logs adicionais falharam ao commitar.")
+            else:
+                st.warning("✨ A geração foi concluída localmente! Os arquivos foram gravados na pasta `/aulas`, mas **não puderam ser enviados ao GitHub** (verifique suas credenciais).")
             
             # Força o rerun automático após a conclusão para carregar a nova aula
             st.rerun()
@@ -600,12 +744,12 @@ def run_page():
     if os.path.exists(path_ultimo):
         opcoes_log["Última Execução"] = path_ultimo
         
-    # 2. Faz a varredura dinâmica na pasta /aulas por logs específicos de aulas
-    if os.path.exists("aulas"):
-        arquivos_aulas = sorted(os.listdir("aulas"))
+    # 2. Faz a varredura dinâmica na pasta /logdasaulasgeradas por logs específicos de aulas
+    if os.path.exists("logdasaulasgeradas"):
+        arquivos_aulas = sorted(os.listdir("logdasaulasgeradas"))
         for f in arquivos_aulas:
             if f.endswith(".log.json"):
-                caminho_log = os.path.join("aulas", f)
+                caminho_log = os.path.join("logdasaulasgeradas", f)
                 try:
                     with open(caminho_log, "r", encoding="utf-8") as lf:
                         data = json.load(lf)
@@ -672,7 +816,35 @@ def run_page():
                 st.metric("Falhas de API (429/503)", f"{total_erros_api} erros", help=f"Detalhamento: {total_erros_429} limite de cota (429) | {total_erros_503} indisp. servidor (503) | {total_erros_outros} outros.")
                 
             # 2. Abas do painel
-            tab_duracao, tab_auditoria = st.tabs(["⏱️ Cronograma das Etapas", "🤖 Auditoria do Loop de Escrita"])
+            tab_relatorio_txt, tab_duracao, tab_auditoria = st.tabs(["📄 Relatório Completo (TXT)", "⏱️ Cronograma das Etapas", "🤖 Auditoria do Loop de Escrita"])
+            
+            with tab_relatorio_txt:
+                log_txt_path = log_path.replace(".log.json", ".log.txt")
+                if os.path.exists(log_txt_path):
+                    try:
+                        with open(log_txt_path, "r", encoding="utf-8") as tf:
+                            conteudo_txt = tf.read()
+                        
+                        st.markdown("##### 📥 Baixar Relatório Descritivo Completo")
+                        st.download_button(
+                            label="Download do Relatório (.txt)",
+                            data=conteudo_txt,
+                            file_name=os.path.basename(log_txt_path),
+                            mime="text/plain",
+                            use_container_width=True
+                        )
+                        
+                        st.markdown("##### 🔍 Visualização do Histórico e Prosa")
+                        st.text_area(
+                            "Histórico de Geração e Conteúdo:",
+                            value=conteudo_txt,
+                            height=500,
+                            disabled=True
+                        )
+                    except Exception as txt_read_err:
+                        st.error(f"Erro ao ler arquivo de texto do log: {txt_read_err}")
+                else:
+                    st.info("O relatório completo em texto (.txt) não está disponível para esta aula (aulas geradas anteriormente não o possuem).")
             
             with tab_duracao:
                 st.markdown("##### Duração proporcional por etapa do pipeline:")

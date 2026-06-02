@@ -76,13 +76,40 @@ with tab_conteudo:
     y_data = r_val * x_data + np.sqrt(1 - r_val**2) * z_data
     
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x_data, y=y_data, mode='markers', marker=dict(color="#1E3A8A", size=8)))
+    fig.add_trace(go.Scatter(x=x_data, y=y_data, mode='markers', marker=dict(color=PRIMARY_BLUE, size=8)))
     fig.update_layout(
-        title=f"Diagrama de Dispersão (r = {r_val})",
-        xaxis=dict(title="Variável X", fixedrange=True),
-        yaxis=dict(title="Variável Y", fixedrange=True),
         template="plotly_white",
-        height=400
+        height=420,
+        margin=dict(l=55, r=30, t=65, b=55, pad=4),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        title=dict(
+            text=f"<b>Diagrama de Dispersão (r = {r_val})</b>",
+            font=dict(size=14, color="#1E293B", family="Arial, sans-serif"),
+            x=0.0,
+            y=0.95
+        ),
+        xaxis=dict(
+            title=dict(text="Variável X", font=dict(size=11, color="#1E293B", family="Arial, sans-serif")),
+            tickfont=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            gridcolor="#E2E8F0",
+            zerolinecolor="#CBD5E1",
+            fixedrange=True
+        ),
+        yaxis=dict(
+            title=dict(text="Variável Y", font=dict(size=11, color="#1E293B", family="Arial, sans-serif")),
+            tickfont=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            gridcolor="#E2E8F0",
+            zerolinecolor="#CBD5E1",
+            fixedrange=True
+        ),
+        showlegend=False,
+        hoverlabel=dict(
+            bgcolor="#FFFFFF",
+            font_size=12,
+            font_color="#1E293B",
+            font_family="Arial, sans-serif"
+        )
     )
     st.plotly_chart(fig, use_container_width=True, key=r"plotly_chart_subtopico_1")
     
@@ -160,19 +187,57 @@ with tab_conteudo:
     
     # Plotly Chart
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x_sim, y=y_sim, mode='markers', name=r"Observações", marker=dict(color="#1E3A8A", size=10)))
-    fig.add_trace(go.Scatter(x=x_sim, y=y_pred, mode='lines', name=r"Modelo ($Y = \beta_0 + \beta_1 X$)", line=dict(color="#10B981", width=3)))
+    fig.add_trace(go.Scatter(x=x_sim, y=y_sim, mode='markers', name=r"Observações", marker=dict(color=PRIMARY_BLUE, size=10)))
+    fig.add_trace(go.Scatter(x=x_sim, y=y_pred, mode='lines', name=r"Modelo ($Y = \beta_0 + \beta_1 X$)", line=dict(color=SECONDARY_GREEN, width=3)))
     
     # Adicionando linhas de resíduos
     for i in range(len(x_sim)):
-        fig.add_trace(go.Scatter(x=[x_sim[i], x_sim[i]], y=[y_sim[i], y_pred[i]], mode='lines', line=dict(color="#991B1B", width=1, dash='dash'), showlegend=False))
+        fig.add_trace(go.Scatter(x=[x_sim[i], x_sim[i]], y=[y_sim[i], y_pred[i]], mode='lines', line=dict(color=CRITICAL_RED, width=1, dash='dash'), showlegend=False))
     
     fig.update_layout(
-        title=r"Minimização Geométrica da Soma dos Quadrados",
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(fixedrange=True),
-        plot_bgcolor='white',
-        margin=dict(l=20, r=20, t=50, b=20)
+        template="plotly_white",
+        height=420,
+        margin=dict(l=55, r=30, t=65, b=55, pad=4),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        title=dict(
+            text="<b>Minimização Geométrica da Soma dos Quadrados</b>",
+            font=dict(size=14, color="#1E293B", family="Arial, sans-serif"),
+            x=0.0,
+            y=0.95
+        ),
+        xaxis=dict(
+            title=dict(text="Variável Independente X", font=dict(size=11, color="#1E293B", family="Arial, sans-serif")),
+            tickfont=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            gridcolor="#E2E8F0",
+            zerolinecolor="#CBD5E1",
+            fixedrange=True
+        ),
+        yaxis=dict(
+            title=dict(text="Variável Dependente Y", font=dict(size=11, color="#1E293B", family="Arial, sans-serif")),
+            tickfont=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            gridcolor="#E2E8F0",
+            zerolinecolor="#CBD5E1",
+            fixedrange=True
+        ),
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1.0,
+            font=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            bgcolor="rgba(255, 255, 255, 0.8)",
+            bordercolor="#E2E8F0",
+            borderwidth=1
+        ),
+        hoverlabel=dict(
+            bgcolor="#FFFFFF",
+            font_size=12,
+            font_color="#1E293B",
+            font_family="Arial, sans-serif"
+        )
     )
     st.plotly_chart(fig, use_container_width=True, key=r"plotly_chart_subtopico_2")
     
@@ -255,15 +320,53 @@ with tab_conteudo:
     
     # Plot
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x_sim, y=y_sim, mode='markers', name=r"Dados Observados", marker=dict(color=r"#1E3A8A")))
-    fig.add_trace(go.Scatter(x=x_sim, y=slope*x_sim + intercept, mode='lines', name=r"Reta Ajustada", line=dict(color=r"#10B981", width=3)))
+    fig.add_trace(go.Scatter(x=x_sim, y=y_sim, mode='markers', name=r"Dados Observados", marker=dict(color=PRIMARY_BLUE)))
+    fig.add_trace(go.Scatter(x=x_sim, y=slope*x_sim + intercept, mode='lines', name=r"Reta Ajustada", line=dict(color=SECONDARY_GREEN, width=3)))
     
     fig.update_layout(
-        title=r"Relação X e Y (Significância p-value: {:.4f})".format(p_value),
-        xaxis=dict(fixedrange=True, title=r"Variável Independente X"),
-        yaxis=dict(fixedrange=True, title=r"Variável Dependente Y"),
-        template=r"plotly_white",
-        margin=dict(l=20, r=20, t=50, b=20)
+        template="plotly_white",
+        height=420,
+        margin=dict(l=55, r=30, t=65, b=55, pad=4),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        title=dict(
+            text="<b>Relação X e Y (Significância p-value: {:.4f})</b>".format(p_value),
+            font=dict(size=14, color="#1E293B", family="Arial, sans-serif"),
+            x=0.0,
+            y=0.95
+        ),
+        xaxis=dict(
+            title=dict(text="Variável Independente X", font=dict(size=11, color="#1E293B", family="Arial, sans-serif")),
+            tickfont=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            gridcolor="#E2E8F0",
+            zerolinecolor="#CBD5E1",
+            fixedrange=True
+        ),
+        yaxis=dict(
+            title=dict(text="Variável Dependente Y", font=dict(size=11, color="#1E293B", family="Arial, sans-serif")),
+            tickfont=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            gridcolor="#E2E8F0",
+            zerolinecolor="#CBD5E1",
+            fixedrange=True
+        ),
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1.0,
+            font=dict(size=9, color="#64748B", family="Arial, sans-serif"),
+            bgcolor="rgba(255, 255, 255, 0.8)",
+            bordercolor="#E2E8F0",
+            borderwidth=1
+        ),
+        hoverlabel=dict(
+            bgcolor="#FFFFFF",
+            font_size=12,
+            font_color="#1E293B",
+            font_family="Arial, sans-serif"
+        )
     )
     st.plotly_chart(fig, use_container_width=True, key=r"plotly_chart_subtopico_3")
     
@@ -335,7 +438,7 @@ with tab_conteudo:
 
 with tab_exercicios:
     import json
-    dados_exercicios = json.loads(r"""{"topico_aula": "3.1. Correlação e Regressão Linear Simples", "questoes_multipla_escolha": [{"enunciado": "Em um estudo sobre a eficiência de um processo industrial de produção de polímeros, um engenheiro químico deseja modelar a temperatura de reação ($X$, em °C) em função da taxa de conversão do produto final ($Y$, em %). Após coletar uma amostra de $n = 30$ observações, ele obtém um coeficiente de correlação de Pearson $r = 0,85$. Assumindo que a relação é linear, qual é a interpretação estatística mais adequada para o coeficiente de determinação ($R^2$) neste contexto?", "alternativas": {"A": "A variável temperatura explica 85% da variabilidade na taxa de conversão do produto.", "B": "A variável temperatura explica aproximadamente 72,25% da variabilidade na taxa de conversão do produto.", "C": "O coeficiente $R^2$ é igual a 0,85, indicando uma relação linear forte e positiva entre as variáveis.", "D": "Existe uma correlação de 72,25% entre a temperatura e a taxa de conversão, indicando causalidade direta.", "E": "O valor de $R^2$ sugere que 15% da variação em $Y$ não é explicada pelo modelo de regressão linear."}, "alternativa_correta": "B", "dica": "Lembre-se que o coeficiente de determinação $R^2$ é o quadrado do coeficiente de correlação $r$. Pense sobre o que o $R^2$ representa em termos de proporção de variância explicada.", "gabarito_comentado": "O coeficiente de determinação $R^2$ é definido como o quadrado do coeficiente de correlação de Pearson ($r^2$). Neste caso, $R^2 = (0,85)^2 = 0,7225$. Estatisticamente, o $R^2$ quantifica a proporção da variância total da variável resposta ($Y$) que é explicada pelo modelo de regressão linear ajustado com a variável preditora ($X$). Portanto, o valor 0,7225 (ou 72,25%) indica que 72,25% da variação na taxa de conversão é explicada pelo modelo linear da temperatura, enquanto o restante (1 - 0,7225 = 27,75%) deve-se a outros fatores ou ao erro aleatório não capturado pelo modelo. As alternativas A e C confundem $r$ com $R^2$. A alternativa D está incorreta pois correlação não implica causalidade e o cálculo percentual está mal aplicado. A alternativa E cita 15%, mas o valor correto não explicado é 27,75%."}, {"enunciado": "Um economista está analisando a relação entre o investimento em marketing ($X$, em milhares de reais) e o volume de vendas ($Y$, em milhares de unidades) de uma empresa. Com os dados coletados, ele ajustou o modelo de regressão linear simples $Y_i = \beta_0 + \beta_1 X_i + \text{e}_i$ e encontrou os estimadores $\\hat{\\beta}_0 = 15$ e $\\hat{\\beta}_1 = 2,5$. Qual é a previsão correta para o volume de vendas se a empresa decidir investir 20 mil reais em marketing?", "alternativas": {"A": "40 mil unidades.", "B": "50 mil unidades.", "C": "65 mil unidades.", "D": "75 mil unidades.", "E": "100 mil unidades."}, "alternativa_correta": "C", "dica": "Aplique a equação da reta de regressão estimada $\\hat{Y} = \\hat{\\beta}_0 + \\hat{\\beta}_1 X$ substituindo o valor de $X$ fornecido.", "gabarito_comentado": "A equação da reta estimada é $\\hat{Y} = 15 + 2,5X$. Para um investimento de $X = 20$, substituímos na equação: $\\hat{Y} = 15 + 2,5(20)$. Calculando: $\\hat{Y} = 15 + 50 = 65$. Portanto, a previsão é de 65 mil unidades. A alternativa A ignorou o intercepto. A alternativa B cometeu erro de cálculo na multiplicação. As alternativas D e E estão incorretas matematicamente."}, {"enunciado": "Ao realizar uma análise de resíduos ($e_i = Y_i - \\hat{Y}_i$) após ajustar um modelo de regressão linear simples, um estatístico observa que, conforme o valor de $X$ aumenta, a dispersão dos resíduos aumenta drasticamente, formando um padrão de 'funil'. Como deve ser interpretado esse diagnóstico?", "alternativas": {"A": "O modelo está perfeitamente ajustado, pois os resíduos mostram uma tendência clara.", "B": "O modelo apresenta homocedasticidade, confirmando que a variância do erro $\\sigma^2$ é constante.", "C": "O modelo apresenta heterocedasticidade, violando uma das premissas clássicas de Gauss-Markov.", "D": "O modelo sofre de autocorrelação, indicando que os erros dependem do tempo.", "E": "O coeficiente $R^2$ será necessariamente igual a 1, devido à variabilidade crescente dos resíduos."}, "alternativa_correta": "C", "dica": "O termo técnico para a constância da variância dos resíduos é homocedasticidade. O oposto disso, observado graficamente como um funil, é uma violação importante.", "gabarito_comentado": "A análise de resíduos é fundamental para validar as suposições do modelo linear. A suposição de homocedasticidade exige que a variância dos erros ($\\sigma^2$) seja constante para todos os níveis de $X$. O aparecimento de um padrão de 'funil' ou 'leque' no gráfico de resíduos vs. valores ajustados indica claramente a presença de heterocedasticidade (variância não constante). Isso viola as premissas de Gauss-Markov, invalidando os intervalos de confiança e testes de hipóteses padrão, a menos que correções como mínimos quadrados ponderados sejam aplicadas. Alternativa A e B são falsas pois a tendência nos resíduos é indesejável. Alternativa D está incorreta pois o problema é de variância, não de autocorrelação. E é falsa."}, {"enunciado": "Considere o teste de hipóteses para a inclinação da reta de regressão populacional: $H_0: \\beta_1 = 0$ contra $H_1: \\beta_1 \\neq 0$. Em uma amostra de $n = 22$, o erro padrão estimado do coeficiente angular é $se(\\hat{\\beta}_1) = 0,5$ e o estimador calculado é $\\hat{\\beta}_1 = 1,2$. Qual é o valor da estatística $t_{\\text{calc}}$ e qual a conclusão estatística ao nível de significância $\\alpha = 0,05$ (dado que $t_{\\text{crit}(0,025, 20)} \\approx 2,086$)?", "alternativas": {"A": "$t_{\\text{calc}} = 0,6$; não rejeitamos $H_0$.", "B": "$t_{\\text{calc}} = 2,4$; rejeitamos $H_0$.", "C": "$t_{\\text{calc}} = 2,4$; não rejeitamos $H_0$.", "D": "$t_{\\text{calc}} = 0,6$; rejeitamos $H_0$.", "E": "$t_{\\text{calc}} = 1,7$; não rejeitamos $H_0$."}, "alternativa_correta": "B", "dica": "A estatística $t_{\\text{calc}}$ é dada pela razão entre o estimador e seu erro padrão: $t_{\\text{calc}} = \\hat{\\beta}_1 / se(\\hat{\\beta}_1)$. Compare com $t_{\\text{crit}}$.", "gabarito_comentado": "Calculamos $t_{\\text{calc}} = \\frac{\\hat{\\beta}_1}{se(\\hat{\\beta}_1)} = \\frac{1,2}{0,5} = 2,4$. Com $n=22$, os graus de liberdade são $n-2 = 20$. O valor crítico para $\\alpha = 0,05$ (bicaudal) é $t_{0,025, 20} = 2,086$. Como $|t_{\\text{calc}}| = 2,4 > 2,086$, caímos na região de rejeição. Portanto, rejeitamos $H_0$ e concluímos que $\\beta_1$ é estatisticamente diferente de zero ao nível de significância de 5%. A alternativa B está correta. A alternativa C ignora a regra de rejeição, e A, D e E calculam ou interpretam incorretamente."}, {"enunciado": "Qual é a principal distinção teórica entre um Intervalo de Confiança para a média condicional $E[Y|X=x_0]$ e um Intervalo de Predição para um valor individual $Y_h$ em uma regressão linear simples?", "alternativas": {"A": "Não há distinção; ambos utilizam a mesma fórmula de erro padrão.", "B": "O intervalo de predição é mais estreito que o intervalo de confiança, pois lida com um único valor.", "C": "O intervalo de confiança considera apenas a incerteza da estimação dos parâmetros, enquanto o intervalo de predição incorpora, adicionalmente, a variabilidade intrínseca do termo de erro $\\epsilon$.", "D": "O intervalo de predição depende apenas do tamanho amostral $n$, enquanto o de confiança depende da variância amostral $S^2$.", "E": "Apenas o intervalo de predição exige que os resíduos sejam normalmente distribuídos."}, "alternativa_correta": "C", "dica": "Pense na fonte de incerteza: ao prever um indivíduo, estamos tentando acertar um ponto específico que possui um erro aleatório associado, enquanto estimar uma média busca apenas o valor esperado da reta naquele ponto.", "gabarito_comentado": "A distinção é fundamental. Ao estimar a média $E[Y|X=x_0]$, a única incerteza provém da estimativa dos parâmetros ($\\hat{\\beta}_0, \\hat{\\beta}_1$). Ao prever um valor individual $Y_h$, enfrentamos essa mesma incerteza dos parâmetros acrescida da variabilidade intrínseca da variável resposta, representada pelo termo de erro $\\epsilon$. Logo, o Intervalo de Predição é sempre mais largo que o Intervalo de Confiança para a média. A alternativa C descreve exatamente essa diferença. A alternativa B inverte a lógica de largura. A alternativa A está incorreta, pois as fórmulas de erro padrão diferem. D e E estão incorretas pois ambos os intervalos dependem de $n$ e da variância dos resíduos."}], "questoes_discursivas": [{"enunciado": "Considere um conjunto de dados com $n = 10$ observações sobre o custo de manutenção ($Y$) e a idade do equipamento ($X$). Suponha que os seguintes valores amostrais foram obtidos: $\\bar{X} = 5$, $\\bar{Y} = 20$, $\\sum (X_i - \\bar{X})^2 = 40$ e $\\sum (X_i - \\bar{X})(Y_i - \\bar{Y}) = 120$. Calcule os estimadores de Mínimos Quadrados Ordinários (MQO) para a inclinação ($\\hat{\\beta}_1$) e para o intercepto ($\\hat{\\beta}_0$).", "dica": "Utilize as fórmulas: $\\hat{\\beta}_1 = \\frac{S_{XY}}{S_{XX}}$ e $\\hat{\\beta}_0 = \\bar{Y} - \\hat{\\beta}_1 \\bar{X}$. Lembre-se que $S_{XX} = \\sum (X_i - \\bar{X})^2$ e $S_{XY} = \\sum (X_i - \\bar{X})(Y_i - \\bar{Y})$.", "gabarito_passo_a_passo": ["Identificar os dados fornecidos: $\\sum (X_i - \\bar{X})^2 = 40$, $\\sum (X_i - \\bar{X})(Y_i - \\bar{Y}) = 120$, $\\bar{X} = 5$, $\\bar{Y} = 20$.", "Calcular $\\hat{\\beta}_1$: $\\hat{\\beta}_1 = \\frac{120}{40} = 3$.", "Calcular $\\hat{\\beta}_0$: $\\hat{\\beta}_0 = \\bar{Y} - \\hat{\\beta}_1 \\bar{X} = 20 - (3 \\times 5) = 20 - 15 = 5$.", "Conclusão: A equação de regressão estimada é $\\hat{Y} = 5 + 3X$."]}, {"enunciado": "Em uma análise de regressão, obteve-se $SQT = 1000$ e $SQE = 200$ para uma amostra de tamanho $n=25$. (a) Calcule o coeficiente de determinação $R^2$ e interprete-o. (b) Determine o Erro Padrão da Estimativa ($S_e$).", "dica": "Use $R^2 = 1 - (SQE/SQT)$ e a fórmula $S_e = \\sqrt{SQE / (n-2)}$. Lembre-se que o denominador para $S_e$ no modelo linear simples é $n-2$.", "gabarito_passo_a_passo": ["Cálculo de $R^2$: $R^2 = 1 - (200 / 1000) = 1 - 0,2 = 0,8$. Isso significa que 80% da variabilidade em $Y$ é explicada pela variável $X$ no modelo.", "Cálculo de $S_e$: $S_e = \\sqrt{\\frac{SQE}{n-2}} = \\sqrt{\\frac{200}{25-2}} = \\sqrt{\\frac{200}{23}}$.", "Resultado do erro padrão: $S_e \\approx \\sqrt{8,695} \\approx 2,949$."]}, {"enunciado": "Dado o modelo $Y_i = \\beta_0 + \\beta_1 X_i + \\epsilon_i$, explique o papel do Método dos Mínimos Quadrados (MQO) na minimização da função $S(\\beta_0, \\beta_1) = \\sum_{i=1}^{n} (Y_i - \\beta_0 - \\beta_1 X_i)^2$. Por que minimizamos os quadrados dos resíduos em vez dos valores absolutos dos resíduos?", "dica": "Considere as propriedades de diferenciabilidade das funções quadráticas em comparação com a função módulo (valor absoluto) no ponto zero.", "gabarito_passo_a_passo": ["O MQO busca encontrar os parâmetros que tornam a reta o mais próxima possível dos dados observados, minimizando a soma das distâncias verticais ao quadrado.", "Matematicamente, a função $f(x) = |x|$ (valor absoluto) não é diferenciável em $x=0$, o que dificulta o uso de métodos de cálculo diferencial para encontrar o mínimo em sistemas complexos.", "A função quadrática $f(x) = x^2$ é contínua e infinitamente diferenciável, permitindo encontrar o mínimo através da igualdade das derivadas parciais a zero (sistema de equações normais).", "Além disso, minimizar quadrados penaliza resíduos grandes mais intensamente do que resíduos pequenos, resultando em estimadores com propriedades estatísticas ótimas (como a não-tendenciosidade e variância mínima sob as hipóteses clássicas)."]}]}""")
+    dados_exercicios = json.loads(r"""{"topico_aula": "3.1. Correlação e Regressão Linear Simples", "questoes_multipla_escolha": [{"enunciado": "Em um estudo sobre a eficiência de um processo industrial de produção de polímeros, um engenheiro químico deseja modelar a temperatura de reação ($X$, em °C) em função da taxa de conversão do produto final ($Y$, em %). Após coletar uma amostra de $n = 30$ observações, ele obtém um coeficiente de correlação de Pearson $r = 0,85$. Assumindo que a relação é linear, qual é a interpretação estatística mais adequada para o coeficiente de determinação ($R^2$) neste contexto?", "alternativas": {"A": "A variável temperatura explica 85% da variabilidade na taxa de conversão do produto.", "B": "A variável temperatura explica aproximadamente 72,25% da variabilidade na taxa de conversão do produto.", "C": "O coeficiente $R^2$ é igual a 0,85, indicando uma relação linear forte e positiva entre as variáveis.", "D": "Existe uma correlação de 72,25% entre a temperatura e a taxa de conversão, indicando causalidade direta.", "E": "O valor de $R^2$ sugere que 15% da variação em $Y$ não é explicada pelo modelo de regressão linear."}, "alternativa_correta": "B", "dica": "Lembre-se que o coeficiente de determinação $R^2$ é o quadrado do coeficiente de correlação $r$. Pense sobre o que o $R^2$ representa em termos de proporção de variância explicada.", "gabarito_comentado": "O coeficiente de determinação $R^2$ é definido como o quadrado do coeficiente de correlação de Pearson ($r^2$). Neste caso, $R^2 = (0,85)^2 = 0,7225$. Estatisticamente, o $R^2$ quantifica a proporção da variância total da variável resposta ($Y$) que é explicada pelo modelo de regressão linear ajustado com a variável preditora ($X$). Portanto, o valor 0,7225 (ou 72,25%) indica que 72,25% da variação na taxa de conversão é explicada pelo modelo linear da temperatura, enquanto o restante (1 - 0,7225 = 27,75%) deve-se a outros fatores ou ao erro aleatório não capturado pelo modelo. As alternativas A e C confundem $r$ com $R^2$. A alternativa D está incorreta pois correlação não implica causalidade e o cálculo percentual está mal aplicado. A alternativa E cita 15%, mas o valor correto não explicado é 27,75%"}, {"enunciado": "Um economista está analisando a relação entre o investimento em marketing ($X$, em milhares de reais) e o volume de vendas ($Y$, em milhares de unidades) de uma empresa. Com os dados coletados, ele ajustou o modelo de regressão linear simples $Y_i = \\beta_0 + \\beta_1 X_i + \\text{e}_i$ e encontrou os estimadores $\\hat{\\beta}_0 = 15$ e $\\hat{\\beta}_1 = 2,5$. Qual é a previsão correta para o volume de vendas se a empresa decidir investir 20 mil reais em marketing?", "alternativas": {"A": "40 mil unidades.", "B": "50 mil unidades.", "C": "65 mil unidades.", "D": "75 mil unidades.", "E": "100 mil unidades."}, "alternativa_correta": "C", "dica": "Aplique a equação da reta de regressão estimada $\\hat{Y} = \\hat{\\beta}_0 + \\hat{\\beta}_1 X$ substituindo o valor de $X$ fornecido.", "gabarito_comentado": "A equação da reta estimada é $\\hat{Y} = 15 + 2,5X$. Para um investimento de $X = 20$, substituímos na equação: $\\hat{Y} = 15 + 2,5(20)$. Calculando: $\\hat{Y} = 15 + 50 = 65$. Portanto, a previsão é de 65 mil unidades. A alternativa A ignorou o intercepto. A alternativa B cometeu erro de cálculo na multiplicação. As alternativas D e E estão incorretas matematicamente."}, {"enunciado": "Ao realizar uma análise de resíduos ($e_i = Y_i - \\hat{Y}_i$) após ajustar um modelo de regressão linear simples, um estatístico observa que, conforme o valor de $X$ aumenta, a dispersão dos resíduos aumenta drasticamente, formando um padrão de 'funil'. Como deve ser interpretado esse diagnóstico?", "alternativas": {"A": "O modelo está perfeitamente ajustado, pois os resíduos mostram uma tendência clara.", "B": "O modelo apresenta homocedasticidade, confirmando que a variância do erro $\\sigma^2$ é constante.", "C": "O modelo apresenta heterocedasticidade, violando uma das premissas clássicas de Gauss-Markov.", "D": "O modelo sofre de autocorrelação, indicando que os erros dependem do tempo.", "E": "O coeficiente $R^2$ será necessariamente igual a 1, devido à variabilidade crescente dos resíduos."}, "alternativa_correta": "C", "dica": "O termo técnico para a constância da variância dos resíduos é homocedasticidade. O oposto disso, observado graficamente como um funil, é uma violação importante.", "gabarito_comentado": "A análise de resíduos é fundamental para validar as suposições do modelo linear. A suposição de homocedasticidade exige que a variância dos erros ($\\sigma^2$) seja constante para todos os níveis de $X$. O aparecimento de um padrão de 'funil' ou 'leque' no gráfico de resíduos vs. valores ajustados indica claramente a presença de heterocedasticidade (variância não constante). Isso viola as premissas de Gauss-Markov, invalidando os intervalos de confiança e testes de hipóteses padrão, a menos que correções como mínimos quadrados ponderados sejam aplicadas. Alternativa A e B são falsas pois a tendência nos resíduos é indesejável. Alternativa D está incorreta pois o problema é de variância, não de autocorrelação. E é falsa."}, {"enunciado": "Considere o teste de hipóteses para a inclinação da reta de regressão populacional: $H_0: \\beta_1 = 0$ contra $H_1: \\beta_1 \\neq 0$. Em uma amostra de $n = 22$, o erro padrão estimado do coeficiente angular é $se(\\hat{\\beta}_1) = 0,5$ e o estimador calculado é $\\hat{\\beta}_1 = 1,2$. Qual é o valor da estatística $t_{\\text{calc}}$ e qual a conclusão estatística ao nível de significância $\\alpha = 0,05$ (dado que $t_{\\text{crit}(0,025, 20)} \\approx 2,086$)?", "alternativas": {"A": "$t_{\\text{calc}} = 0,6$; não rejeitamos $H_0$.", "B": "$t_{\\text{calc}} = 2,4$; rejeitamos $H_0$.", "C": "$t_{\\text{calc}} = 2,4$; não rejeitamos $H_0$.", "D": "$t_{\\text{calc}} = 0,6$; rejeitamos $H_0$.", "E": "$t_{\\text{calc}} = 1,7$; não rejeitamos $H_0$."}, "alternativa_correta": "B", "dica": "A estatística $t_{\\text{calc}}$ é dada pela razão entre o estimador e seu erro padrão: $t_{\\text{calc}} = \\hat{\\beta}_1 / se(\\hat{\\beta}_1)$. Compare com $t_{\\text{crit}}$.", "gabarito_comentado": "Calculamos $t_{\\text{calc}} = \\frac{\\hat{\\beta}_1}{se(\\hat{\\beta}_1)} = \\frac{1,2}{0,5} = 2,4$. Com $n=22$, os graus de liberdade são $n-2 = 20$. O valor crítico para $\\alpha = 0,05$ (bicaudal) é $t_{0,025, 20} = 2,086$. Como $|t_{\\text{calc}}| = 2,4 > 2,086$, caímos na região de rejeição. Portanto, rejeitamos $H_0$ e concluímos que $\\beta_1$ é estatisticamente diferente de zero ao nível de significância de 5%. A alternativa B está correta. A alternativa C ignora a regra de rejeição, e A, D e E calculam ou interpretam incorretamente."}, {"enunciado": "Qual é a principal distinção teórica entre um Intervalo de Confiança para a média condicional $E[Y|X=x_0]$ e um Intervalo de Predição para um valor individual $Y_h$ em uma regressão linear simples?", "alternativas": {"A": "Não há distinção; ambos utilizam a mesma fórmula de erro padrão.", "B": "O intervalo de predição é mais estreito que o intervalo de confiança, pois lida com um único valor.", "C": "O intervalo de confiança considera apenas a incerteza da estimação dos parâmetros, enquanto o intervalo de predição incorpora, adicionalmente, a variabilidade intrínseca do termo de erro $\\epsilon$.", "D": "O intervalo de predição depende apenas do tamanho amostral $n$, enquanto o de confiança depende da variância amostral $S^2$.", "E": "Apenas o intervalo de predição exige que os resíduos sejam normalmente distribuídos."}, "alternativa_correta": "C", "dica": "Pense na fonte de incerteza: ao prever um indivíduo, estamos tentando acertar um ponto específico que possui um erro aleatório associado, enquanto estimar uma média busca apenas o valor esperado da reta naquele ponto.", "gabarito_comentado": "A distinção é fundamental. Ao estimar a média $E[Y|X=x_0]$, a única incerteza provém da estimativa dos parâmetros ($\\hat{\\beta}_0, \\hat{\\beta}_1$). Ao prever um valor individual $Y_h$, enfrentamos essa mesma incerteza dos parâmetros acrescida da variabilidade intrínseca da variável resposta, representada pelo termo de erro $\\epsilon$. Logo, o Intervalo de Predição é sempre mais largo que o Intervalo de Confiança para a média. A alternativa C descreve exatamente essa diferença. A alternativa B inverte a lógica de largura. A alternativa A está incorreta, pois as fórmulas de erro padrão diferem. D e E estão incorretas pois ambos os intervalos dependem de $n$ e da variância dos resíduos."}], "questoes_discursivas": [{"enunciado": "Considere um conjunto de dados com $n = 10$ observações sobre o custo de manutenção ($Y$) e a idade do equipamento ($X$). Suponha que os seguintes valores amostrais foram obtidos: $\\bar{X} = 5$, $\\bar{Y} = 20$, $\\sum (X_i - \\bar{X})^2 = 40$ e $\\sum (X_i - \\bar{X})(Y_i - \\bar{Y}) = 120$. Calcule os estimadores de Mínimos Quadrados Ordinários (MQO) para a inclinação ($\\hat{\\beta}_1$) e para o intercepto ($\\hat{\\beta}_0$).", "dica": "Utilize as fórmulas: $\\hat{\\beta}_1 = \\frac{S_{XY}}{S_{XX}}$ e $\\hat{\\beta}_0 = \\bar{Y} - \\hat{\\beta}_1 \\bar{X}$. Lembre-se que $S_{XX} = \\sum (X_i - \\bar{X})^2$ e $S_{XY} = \\sum (X_i - \\bar{X})(Y_i - \\bar{Y})$.", "gabarito_passo_a_passo": ["Identificar os dados fornecidos: $\\sum (X_i - \\bar{X})^2 = 40$, $\\sum (X_i - \\bar{X})(Y_i - \\bar{Y}) = 120$, $\\bar{X} = 5$, $\\bar{Y} = 20$.", "Calcular $\\hat{\\beta}_1$: $\\hat{\\beta}_1 = \\frac{120}{40} = 3$.", "Calcular $\\hat{\\beta}_0$: $\\hat{\\beta}_0 = \\bar{Y} - \\hat{\\beta}_1 \\bar{X} = 20 - (3 \\times 5) = 20 - 15 = 5$.", "Conclusão: A equação de regressão estimada é $\\hat{Y} = 5 + 3X$."]}, {"enunciado": "Em uma análise de regressão, obteve-se $SQT = 1000$ e $SQE = 200$ para uma amostra de tamanho $n=25$. (a) Calcule o coeficiente de determinação $R^2$ e interprete-o. (b) Determine o Erro Padrão da Estimativa ($S_e$).", "dica": "Use $R^2 = 1 - (SQE/SQT)$ e a fórmula $S_e = \\sqrt{SQE / (n-2)}$. Lembre-se que o denominador para $S_e$ no modelo linear simples é $n-2$.", "gabarito_passo_a_passo": ["Cálculo de $R^2$: $R^2 = 1 - (200 / 1000) = 1 - 0,2 = 0,8$. Isso significa que 80% da variabilidade em $Y$ é explicada pela variável $X$ no modelo.", "Cálculo de $S_e$: $S_e = \\sqrt{\\frac{SQE}{n-2}} = \\sqrt{\\frac{200}{25-2}} = \\sqrt{\\frac{200}{23}}$.", "Resultado do erro padrão: $S_e \\approx \\sqrt{8,695} \\approx 2,949$."]}, {"enunciado": "Dado o modelo $Y_i = \\beta_0 + \\beta_1 X_i + \\epsilon_i$, explique o papel do Método dos Mínimos Quadrados (MQO) na minimização da função $S(\\beta_0, \\beta_1) = \\sum_{i=1}^{n} (Y_i - \\beta_0 - \\beta_1 X_i)^2$. Por que minimizamos os quadrados dos resíduos em vez dos valores absolutos dos resíduos?", "dica": "Considere as propriedades de diferenciabilidade das funções quadráticas em comparação com a função módulo (valor absoluto) no ponto zero.", "gabarito_passo_a_passo": ["O MQO busca encontrar os parâmetros que tornam a reta o mais próxima possível dos dados observados, minimizando a soma das distâncias verticais ao quadrado.", "Matematicamente, a função $f(x) = |x|$ (valor absoluto) não é diferenciável em $x=0$, o que dificulta o uso de métodos de cálculo diferencial para encontrar o mínimo em sistemas complexos.", "A função quadrática $f(x) = x^2$ é contínua e infinitamente diferenciável, permitindo encontrar o mínimo através da igualdade das derivadas parciais a zero (sistema de equações normais).", "Além disso, minimizar quadrados penaliza resíduos grandes mais intensamente do que resíduos pequenos, resultando em estimadores com propriedades estatísticas ótimas (como a não-tendenciosidade e variância mínima sob as hipóteses clássicas)."]}]}""")
 
 
     import streamlit as st

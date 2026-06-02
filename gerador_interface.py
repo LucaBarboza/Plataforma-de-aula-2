@@ -46,22 +46,32 @@ carregar_chave_api()
 # ==============================================================================
 # FASE A: FUNÇÃO ESPECIALISTA EM PROCESSAR UMA FATIA DE TEORIA
 # ==============================================================================
-def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_grafico: str = "plotly", chave_suffix: str = "") -> str:
+def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_grafico: str = "plotly", chave_suffix: str = "", cor_principal: str = "#1E3A8A", cor_critica: str = "#991B1B") -> str:
     # Garante a inicialização da chave
     carregar_chave_api()
     client = genai.Client()
     
     if motor_grafico.lower() == "seaborn":
         grafico_especifico = f"""Crie um gráfico Seaborn/Matplotlib premium altamente científico e estilizado. 
-        Configure o tema usando `sns.set_theme(style="whitegrid", rc={{"grid.linestyle": "--", "grid.alpha": 0.5, "grid.color": "#E2E8F0"}})` e use a fonte 'sans-serif'.
-        Use `fig, ax = plt.subplots(figsize=(10, 5), dpi=300)` e garanta a remoção de bordas com `sns.despine(left=True, bottom=False, right=True, top=True)`.
-        Assegure que as cores usadas sigam a paleta estrita: PRIMARY_BLUE = "#1E3A8A", SECONDARY_GREEN = "#10B981", WARNING_AMBER = "#F59E0B", CRITICAL_RED = "#991B1B".
+        Configure o tema usando `sns.set_theme(style="whitegrid", rc={{"grid.linestyle": "--", "grid.alpha": 0.5, "grid.color": "#E2E8F0", "font.family": "sans-serif", "font.sans-serif": ["Arial", "DejaVu Sans", "Helvetica"]}})` e use a fonte 'sans-serif'.
+        Use `fig, ax = plt.subplots(figsize=(10, 5), dpi=300)` e configure as cores de fundo `fig.patch.set_facecolor('#FFFFFF')` and `ax.set_facecolor('#FFFFFF')`. Garanta a remoção de bordas com `sns.despine(left=True, bottom=False, right=True, top=True)`.
+        Assegure que as cores usadas sigam a paleta estrita: PRIMARY_BLUE = "{cor_principal}", SECONDARY_GREEN = "#10B981", WARNING_AMBER = "#F59E0B", CRITICAL_RED = "{cor_critica}", LIGHT_SLATE = "#F8FAFC", GRID_GRAY = "#E2E8F0", TEXT_MAIN = "#1E293B", TEXT_MUTED = "#64748B".
+        Use títulos de eixos e título principal formatados com tamanho de fonte estrito: título 14 (negrito, TEXT_MAIN), eixos 11 (TEXT_MAIN), ticks 9 (TEXT_MUTED) e legenda 9 (TEXT_MUTED) em fundo LIGHT_SLATE com borda GRID_GRAY.
         Renderize no Streamlit usando `st.pyplot(fig)`. Libere a memória no final chamando `plt.close(fig)`."""
     else:
         grafico_especifico = f"""Crie um gráfico Plotly premium altamente interativo e condizente com a proposta. 
-        Configure o gráfico com eixos travados para mobile se for um gráfico 2D (`fixedrange=True` nas propriedades de `xaxis` e `yaxis` do `fig.update_layout()`, NUNCA no layout raiz). Se for um gráfico 3D (que utiliza scene=dict(...)), NUNCA use fixedrange em scene, xaxis, yaxis ou zaxis, pois o Plotly não suporta essa propriedade em gráficos 3D e lançará um ValueError.
-        Assegure que as cores usadas sigam a paleta estrita: PRIMARY_BLUE = "#1E3A8A", SECONDARY_GREEN = "#10B981", WARNING_AMBER = "#F59E0B", CRITICAL_RED = "#991B1B".
-        Renderize no Streamlit usando `st.plotly_chart(fig, use_container_width=True, key=r"plotly_chart_{chave_suffix}")`."""
+        Configure o gráfico com as seguintes diretrizes estritas de layout de forma absoluta:
+        - `template="plotly_white"`
+        - `height=420`
+        - `margin=dict(l=55, r=30, t=65, b=55, pad=4)`
+        - Fundo do plot (`plot_bgcolor`) e do papel (`paper_bgcolor`) brancos ou transparentes. Nunca use fundos pretos ou coloridos.
+        - Título com tag HTML `<b>` e fonte de tamanho 14, cor "#1E293B", família "Arial, sans-serif", alinhado à esquerda: `title=dict(text="<b>Título Estruturado</b>", font=dict(size=14, color="#1E293B", family="Arial, sans-serif"), x=0.0, y=0.95)`.
+        - Eixos 2D configurados com `fixedrange=True` para estabilidade mobile nas propriedades de `xaxis` e `yaxis`. Se for gráfico 3D, nunca use `fixedrange` em scene, xaxis, yaxis ou zaxis.
+        - Eixos com títulos de tamanho 11, cor "#1E293B", família "Arial, sans-serif", e tickfont com tamanho 9, cor "#64748B", família "Arial, sans-serif". Defina gridcolor="#E2E8F0" e zerolinecolor="#CBD5E1".
+        - Legenda horizontal no topo do gráfico para economizar espaço e evitar desalinhamento: `legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1.0, font=dict(size=9, color="#64748B", family="Arial, sans-serif"), bgcolor="rgba(255, 255, 255, 0.8)", bordercolor="#E2E8F0", borderwidth=1)`.
+        - Caixa de dica flutuante (hoverlabel) customizada: `hoverlabel=dict(bgcolor="#FFFFFF", font_size=12, font_color="#1E293B", font_family="Arial, sans-serif")`.
+        - Assegure que as cores usadas sigam a paleta estrita de cores: PRIMARY_BLUE = "{cor_principal}", SECONDARY_GREEN = "#10B981", WARNING_AMBER = "#F59E0B", CRITICAL_RED = "{cor_critica}", LIGHT_SLATE = "#F8FAFC", GRID_GRAY = "#E2E8F0", TEXT_MAIN = "#1E293B", TEXT_MUTED = "#64748B".
+        - Renderize no Streamlit usando `st.plotly_chart(fig, use_container_width=True, key=r"plotly_chart_{chave_suffix}")`."""
 
     prompt = f"""
     Você é um UI/UX Designer Frontend especialista em Streamlit para Educação Executiva.
@@ -324,7 +334,7 @@ def validar_execucao_codigo(codigo_python: str):
 # ==============================================================================
 # FASE C: ORQUESTRADOR LOCAL DE MONTAGEM E COMPILAÇÃO (PYTHON SEWING)
 # ==============================================================================
-def compilar_aula_completa_por_fatias(caminho_teoria_lapidada: str, caminho_exercicios: str, motor_grafico: str = "plotly"):
+def compilar_aula_completa_por_fatias(caminho_teoria_lapidada: str, caminho_exercicios: str, motor_grafico: str = "plotly", cor_principal: str = "#1E3A8A", cor_critica: str = "#991B1B"):
     if not os.path.exists(caminho_teoria_lapidada) or not os.path.exists(caminho_exercicios):
         print("[ERRO] Erro critico: Payloads de entrada ausentes no diretorio.")
         return
@@ -371,7 +381,7 @@ metadata = json.loads(base64.b64decode('{metadata_b64}').decode('utf-8'))
 # Injeção de Estilos CSS Acadêmicos Premium
 st.markdown(\"\"\"
     <style>
-        .premium-title {{ font-size: 2.2rem; font-weight: 800; color: #1E3A8A; margin-bottom: 0.2rem; }}
+        .premium-title {{ font-size: 2.2rem; font-weight: 800; color: {cor_principal}; margin-bottom: 0.2rem; }}
         .premium-subtitle {{ font-size: 1.1rem; color: #64748B; margin-bottom: 1.5rem; font-style: italic; }}
     </style>
 \"\"\", unsafe_allow_html=True)
@@ -380,10 +390,10 @@ st.markdown(f'<div class="premium-title">{{metadata["tema_global"]}}</div>', uns
 st.markdown('<div class="premium-subtitle">Conteúdo Acadêmico Digital e Simuladores Integrados</div>', unsafe_allow_html=True)
 
 # Definição de Cores Globais da Paleta Premium
-PRIMARY_BLUE = "#1E3A8A"
+PRIMARY_BLUE = "{cor_principal}"
 SECONDARY_GREEN = "#10B981"
 WARNING_AMBER = "#F59E0B"
-CRITICAL_RED = "#991B1B"
+CRITICAL_RED = "{cor_critica}"
 
 # Criação das Duas Grandes Abas Globais
 tab_conteudo, tab_exercicios = st.tabs(["📚 Conteúdo Acadêmico Interativo", "📝 Caderno de Exercícios"])
@@ -404,7 +414,7 @@ with tab_conteudo:
         chave_str = str(idx + 1)
         nome_simulador = simuladores_dict.get(chave_str, "")
         
-        fatia_teoria_codigo = programar_fatia_teoria(pagina, nome_simulador=nome_simulador, motor_grafico=motor_grafico, chave_suffix=f"subtopico_{idx + 1}")
+        fatia_teoria_codigo = programar_fatia_teoria(pagina, nome_simulador=nome_simulador, motor_grafico=motor_grafico, chave_suffix=f"subtopico_{idx + 1}", cor_principal=cor_principal, cor_critica=cor_critica)
         
         # AJUSTE DEFENSIVO DE INDENTAÇÃO: Remove recuo base indesejado que a IA possa ter gerado
         linhas = fatia_teoria_codigo.split("\n")

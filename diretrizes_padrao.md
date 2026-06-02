@@ -82,16 +82,20 @@ Sempre que o agente traduzir ou deduzir formulações teóricas extraídas do RA
 
 Para garantir que os gráficos gerados pela IA sejam visualmente **extraordinários, refinados, estritamente padronizados e adequados para publicações científicas de alto impacto**, as diretrizes visuais abaixo devem ser injetadas de forma absoluta no código. **Nenhum gráfico gerado pode desviar desta folha de estilo.**
 
+> [!IMPORTANT]
+> **IMUTABILIDADE DE FORMATO E FONTE:**
+> As diretrizes de formato de layout (como uso de fundos brancos/transparentes, legenda horizontal no topo, margens compactas e hoverlabels personalizados) e a família de fontes (sempre sem serifa - Arial ou DejaVu Sans) são **estritas e totalmente imutáveis**. Nem o agente gerador de código, nem os arquivos de aula individuais podem alterar estas definições de formato ou tipografia. Apenas as cores da paleta (cor principal e crítica) podem ser adaptadas dinamicamente de acordo com a identidade visual da aula.
+
 ### 🎨 2.1 Identidade Visual e Paleta de Cores Rigorosa
 
 A paleta de cores é inspirada em design de dados moderno acadêmico, usando alta sobriedade e excelente contraste. Qualquer elemento visual deve adotar as cores hexadecimais abaixo de forma funcional:
 
 ```json
 {
-  "PRIMARY_BLUE": "#1E3A8A",      // Azul Escuro Acadêmico: Usado para curvas principais, dados observados e linhas de referência.
+  "PRIMARY_BLUE": "#1E3A8A",      // Azul Escuro Acadêmico: Usado para curvas principais, dados observados e linhas de referência (customizável).
   "SECONDARY_GREEN": "#10B981",    // Verde Esmeralda: Usado para áreas de sucesso, limites de aceitação ou dados controle.
   "WARNING_AMBER": "#F59E0B",      // Laranja Âmbar: Usado para destacar pontos de transição ou desvios moderados.
-  "CRITICAL_RED": "#991B1B",       // Vermelho Alerta Escuro: Usado estritamente para a Região de Rejeição (RC) e áreas críticas.
+  "CRITICAL_RED": "#991B1B",       // Vermelho Alerta Escuro: Usado estritamente para a Região de Rejeição (RC) e áreas críticas (customizável).
   "LIGHT_SLATE": "#F8FAFC",        // Fundo Sutil de Painel: Usado em áreas de preenchimento ou backgrounds de plotagem secundários.
   "GRID_GRAY": "#E2E8F0",          // Cinza Sutil para Grades: Usado nas linhas tracejadas de apoio (grid).
   "TEXT_MAIN": "#1E293B",          // Grafite Escuro: Usado para todos os títulos de eixos e textos principais.
@@ -99,9 +103,9 @@ A paleta de cores é inspirada em design de dados moderno acadêmico, usando alt
 }
 ```
 
-### 🔤 2.2 Tipografia e Hierarquia de Fontes
+### 🔤 2.2 Tipografia e Hierarquia de Fontes (Imutáveis)
 
-Para assegurar legibilidade em qualquer dispositivo:
+Para assegurar legibilidade em qualquer dispositivo, a tipografia é fixa e não pode ser customizada ou alterada:
 * **Família de Fontes Principal**: Utilizar fontes limpas e sem serifa (`'DejaVu Sans'`, `'Arial'`, `'sans-serif'`).
 * **Uso de LaTeX**: Todas as fórmulas matemáticas inseridas em legendas, rótulos de eixos ou títulos do gráfico **devem ser escritas em formato de "raw string" LaTeX**, por exemplo: `r"Média Amostral ($\bar{X}$)"`.
 * **Escala de Tamanhos Estrita**:
@@ -167,7 +171,7 @@ plt.close(fig) # Liberar memória explicitamente
 
 ### 📊 Cenário B: Se o motor gráfico ativo for PLOTLY
 
-O programador deve forçar uma folha de estilo web premium, fluida e totalmente otimizada para mobile. O layout Plotly deve ser atualizado estritamente como demonstrado abaixo:
+O programador deve forçar uma folha de estilo web premium, fluida e totalmente otimizada para mobile. O layout Plotly deve ser updated estritamente como demonstrado abaixo:
 
 ```python
 import plotly.graph_objects as go
