@@ -114,7 +114,7 @@ def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_gra
     4. GRÁFICOS NO MEIO DO TEXTO: Se o parâmetro 'nome_simulador' for fornecido (não vazio), insira os sliders e o gráfico correspondente a esse conceito (utilizando a biblioteca '{motor_grafico}') imediatamente após o bloco de formalismo matemático (`st.info` / `st.latex`), dividindo as variáveis em colunas elegantes (`st.columns`) para que os seletores/sliders não fiquem gigantes na tela.
        O simulador a ser programado é: '{nome_simulador}'.
        {grafico_especifico}
-       Use chaves únicas baseadas no título do subtópico para os sliders do Streamlit para evitar DuplicateWidgetID.
+       Use chaves únicas que terminem obrigatoriamente com o sufixo '_{chave_suffix}' para todos os widgets e sliders do Streamlit para evitar DuplicateWidgetID.
         
     5. TRATAMENTO DE LATEX E BARRAS INVERTIDAS: Use raw strings (prefixadas por 'r', ex: st.write(r"...") ou st.markdown(r"...")) em absolutamente todos os componentes markdown e latex para evitar SyntaxWarnings ou quebras de renderização no Streamlit. NUNCA use f-strings dinâmicas combinadas com chaves matemáticas (como rf"...") pois isso quebra a sintaxe do Python.
      
@@ -399,11 +399,24 @@ def validar_execucao_codigo(codigo_python: str, extra_globals: dict = None):
     
     # 1. Definição do Mock de Streamlit e Valores em uma classe unificada robusta
     class MockStreamlitElement:
-        def __getattr__(self, name): return MockStreamlitElement()
+        def __init__(self, parent=None):
+            self._parent = parent
+            
+        def __getattr__(self, name): 
+            if name in ['__enter__', '__exit__']:
+                raise AttributeError()
+            
+            def func(*args, **kwargs):
+                key = kwargs.get('key')
+                if self._parent:
+                    self._parent._register_key(key)
+                return MockStreamlitElement(self._parent)
+            return func
+            
         def __enter__(self): return self
         def __exit__(self, exc_type, exc_val, exc_tb): pass
-        def __call__(self, *args, **kwargs): return MockStreamlitElement()
-        def __iter__(self): return iter([MockStreamlitElement(), MockStreamlitElement()])
+        def __call__(self, *args, **kwargs): return MockStreamlitElement(self._parent)
+        def __iter__(self): return iter([MockStreamlitElement(self._parent), MockStreamlitElement(self._parent)])
         
         # Operações de string comuns (evita AttributeError quando a IA trata retorno de widget como string)
         def split(self, *args, **kwargs): return [self]
@@ -441,18 +454,40 @@ def validar_execucao_codigo(codigo_python: str, extra_globals: dict = None):
         def __int__(self): return 1
         def __str__(self): return "1.0"
 
+    class MockSessionState:
+        def __getattr__(self, name): return MockStreamlitElement()
+        def __setattr__(self, name, value): pass
+        def __getitem__(self, item): return MockStreamlitElement()
+        def __setitem__(self, key, value): pass
+        def __contains__(self, item): return False
+
     class MockStreamlit:
         def __init__(self):
-            self.sidebar = MockStreamlitElement()
+            self.sidebar = MockStreamlitElement(self)
+            self.session_state = MockSessionState()
+            self._keys = set()
+            
+        def _register_key(self, key):
+            if key is not None:
+                key_str = str(key)
+                if key_str in self._keys:
+                    raise ValueError(f"StreamlitDuplicateElementKey: There are multiple elements with the same key='{key_str}'.")
+                self._keys.add(key_str)
+                
         def __getattr__(self, name):
             if name in ['columns', 'tabs']:
                 def func(spec, *args, **kwargs):
                     if isinstance(spec, int):
-                        return [MockStreamlitElement() for _ in range(spec)]
+                        return [MockStreamlitElement(self) for _ in range(spec)]
                     else:
-                        return [MockStreamlitElement() for _ in range(len(spec))]
+                        return [MockStreamlitElement(self) for _ in range(len(spec))]
                 return func
-            return MockStreamlitElement()
+            
+            def func(*args, **kwargs):
+                key = kwargs.get('key')
+                self._register_key(key)
+                return MockStreamlitElement(self)
+            return func
 
     # Mocks para Matplotlib / Seaborn
     class MockPlot:
@@ -461,8 +496,10 @@ def validar_execucao_codigo(codigo_python: str, extra_globals: dict = None):
         def __enter__(self): return self
         def __exit__(self, exc_type, exc_val, exc_tb): pass
 
+    mock_st = MockStreamlit()
+
     globals_dict = {
-        'st': MockStreamlit(),
+        'st': mock_st,
         'np': np,
         'pd': pd,
         'go': go,
@@ -479,8 +516,18 @@ def validar_execucao_codigo(codigo_python: str, extra_globals: dict = None):
     if extra_globals:
         globals_dict.update(extra_globals)
         
-    # Executa o código. Se disparar qualquer erro, nós capturamos e levantamos.
-    exec(codigo_python, globals_dict)
+    import sys
+    original_streamlit = sys.modules.get('streamlit')
+    sys.modules['streamlit'] = mock_st
+    
+    try:
+        # Executa o código. Se disparar qualquer erro, nós capturamos e levantamos.
+        exec(codigo_python, globals_dict)
+    finally:
+        if original_streamlit is not None:
+            sys.modules['streamlit'] = original_streamlit
+        else:
+            sys.modules.pop('streamlit', None)
 
 def validar_fatia(codigo_fatia: str, extra_globals: dict = None) -> tuple[bool, str]:
     """
