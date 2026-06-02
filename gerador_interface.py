@@ -44,9 +44,7 @@ def carregar_chave_api():
 carregar_chave_api()
 
 # ==============================================================================
-# FASE A: FUNÇÃO ESPECIALISTA EM PROCESSAR UMA FATIA DE TEORIA
-# ==============================================================================
-def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_grafico: str = "plotly", chave_suffix: str = "", cor_principal: str = "#1E3A8A", cor_critica: str = "#991B1B") -> str:
+def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_grafico: str = "plotly", chave_suffix: str = "", cor_principal: str = "#1E3A8A", cor_critica: str = "#991B1B", cor_secundaria: str = "#10B981", cor_alerta: str = "#F59E0B") -> str:
     # Garante a inicialização da chave
     carregar_chave_api()
     client = genai.Client()
@@ -55,7 +53,7 @@ def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_gra
         grafico_especifico = f"""Crie um gráfico Seaborn/Matplotlib premium altamente científico e estilizado. 
         Configure o tema usando `sns.set_theme(style="whitegrid", rc={{"grid.linestyle": "--", "grid.alpha": 0.5, "grid.color": "#E2E8F0", "font.family": "sans-serif", "font.sans-serif": ["Arial", "DejaVu Sans", "Helvetica"]}})` e use a fonte 'sans-serif'.
         Use `fig, ax = plt.subplots(figsize=(10, 5), dpi=300)` e configure as cores de fundo `fig.patch.set_facecolor('#FFFFFF')` e `ax.set_facecolor('#FFFFFF')`. Garanta a remoção de bordas com `sns.despine(left=True, bottom=False, right=True, top=True)`.
-        Assegure que as cores usadas sigam a paleta estrita: PRIMARY_BLUE = "{cor_principal}", SECONDARY_GREEN = "#10B981", WARNING_AMBER = "#F59E0B", CRITICAL_RED = "{cor_critica}", LIGHT_SLATE = "#F8FAFC", GRID_GRAY = "#E2E8F0", TEXT_MAIN = "#1E293B", TEXT_MUTED = "#64748B".
+        Assegure que as cores usadas sigam a paleta estrita: PRIMARY_BLUE = "{cor_principal}", SECONDARY_GREEN = "{cor_secundaria}", WARNING_AMBER = "{cor_alerta}", CRITICAL_RED = "{cor_critica}", LIGHT_SLATE = "#F8FAFC", GRID_GRAY = "#E2E8F0", TEXT_MAIN = "#1E293B", TEXT_MUTED = "#64748B".
         Use títulos de eixos e título principal formatados com tamanho de fonte estrito: título 14 (negrito, TEXT_MAIN), eixos 11 (TEXT_MAIN), ticks 9 (TEXT_MUTED) e legenda 9 (TEXT_MUTED) em fundo LIGHT_SLATE com borda GRID_GRAY.
         Renderize no Streamlit usando `st.pyplot(fig)`. Libere a memória no final chamando `plt.close(fig)`."""
     else:
@@ -70,7 +68,7 @@ def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_gra
         - Eixos com títulos de tamanho 11, cor "#1E293B", família "Arial, sans-serif", e tickfont com tamanho 9, cor "#64748B", família "Arial, sans-serif". Defina gridcolor="#E2E8F0" e zerolinecolor="#CBD5E1".
         - Legenda horizontal no topo do gráfico para economizar espaço e evitar desalinhamento: `legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1.0, font=dict(size=9, color="#64748B", family="Arial, sans-serif"), bgcolor="rgba(255, 255, 255, 0.8)", bordercolor="#E2E8F0", borderwidth=1)`.
         - Caixa de dica flutuante (hoverlabel) customizada: `hoverlabel=dict(bgcolor="#FFFFFF", font_size=12, font_color="#1E293B", font_family="Arial, sans-serif")`.
-        - Assegure que as cores usadas sigam a paleta estrita de cores: PRIMARY_BLUE = "{cor_principal}", SECONDARY_GREEN = "#10B981", WARNING_AMBER = "#F59E0B", CRITICAL_RED = "{cor_critica}", LIGHT_SLATE = "#F8FAFC", GRID_GRAY = "#E2E8F0", TEXT_MAIN = "#1E293B", TEXT_MUTED = "#64748B".
+        - Assegure que as cores usadas sigam a paleta estrita de cores: PRIMARY_BLUE = "{cor_principal}", SECONDARY_GREEN = "{cor_secundaria}", WARNING_AMBER = "{cor_alerta}", CRITICAL_RED = "{cor_critica}", LIGHT_SLATE = "#F8FAFC", GRID_GRAY = "#E2E8F0", TEXT_MAIN = "#1E293B", TEXT_MUTED = "#64748B".
         - Renderize no Streamlit usando `st.plotly_chart(fig, use_container_width=True, key=r"plotly_chart_{chave_suffix}")`."""
 
     prompt = f"""
@@ -140,25 +138,88 @@ def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_gra
     )
     
     max_tentativas = 5
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text=json.dumps(dados_subtopico, ensure_ascii=False)),
+                types.Part.from_text(text=prompt)
+            ]
+        )
+    ]
+    
+    ultimo_codigo = ""
+    
     for tentativa in range(max_tentativas):
         try:
             resposta = client.models.generate_content(
                 model="gemini-3.1-flash-lite",
-                contents=[json.dumps(dados_subtopico, ensure_ascii=False), prompt],
+                contents=contents,
                 config=config
             )
             
-            match = re.search(r"```python\s*(.*?)\s*```", resposta.text, re.DOTALL)
-            return match.group(1).strip() if match else resposta.text.strip()
+            resposta_texto = resposta.text
+            match = re.search(r"```python\s*(.*?)\s*```", resposta_texto, re.DOTALL)
+            codigo_gerado = match.group(1).strip() if match else resposta_texto.strip()
+            ultimo_codigo = codigo_gerado
+            
+            # Validação sintática e de execução mockada
+            ok, erro_msg = validar_fatia(codigo_gerado)
+            if ok:
+                print(f"[OK] Fatia de teoria gerada e validada com sucesso na tentativa {tentativa+1}.")
+                return codigo_gerado
+            else:
+                print(f"[AVISO] Tentativa {tentativa+1}/{max_tentativas} falhou na validação da fatia de teoria. Erro:\n{erro_msg}")
+                
+                # Prepara o prompt de autocorreção enviando o código incorreto e a mensagem de erro
+                prompt_correcao = f"""[MENSAGEM DE ERRO NA VALIDAÇÃO]
+O código Python gerado anteriormente falhou nos testes de compilação ou execução simulada com o seguinte erro:
+---
+{erro_msg}
+---
+
+Por favor, analise a mensagem de erro acima e corrija o código gerado.
+Instruções de autocorreção:
+1. NÃO use nem referencie variáveis ou dicionários dinâmicos em tempo de execução no script gerado (como tentar acessar 'dados_subtopico', 'pagina', 'exemplo', 'passo', 'data', etc.). Todo o conteúdo do JSON recebido na primeira mensagem deve ser escrito diretamente como strings literais estáticas (hardcoded) no código Streamlit final.
+2. Certifique-se de que todas as strings de texto longas sejam raw strings válidas (ex: r"texto" ou r\"\"\"texto\"\"\").
+3. NUNCA termine uma raw string com uma barra invertida (ex: r"texto\") para não quebrar a compilação do Python. Se precisar colocar uma barra invertida antes de aspas, use string normal ou escape-a corretamente.
+4. NUNCA use 'with' com st.info, st.warning, st.error ou st.success. Chame-os diretamente: st.info(r"...")
+5. O código gerado deve ser sintaticamente correto para o Python 3.12+.
+
+Retorne APENAS o código Python corrigido completo dentro do bloco:
+```python
+# Seu código corrigido aqui
+```"""
+                # Registra o histórico da conversa
+                contents.append(
+                    types.Content(
+                        role="model",
+                        parts=[types.Part.from_text(text=resposta_texto)]
+                    )
+                )
+                contents.append(
+                    types.Content(
+                        role="user",
+                        parts=[types.Part.from_text(text=prompt_correcao)]
+                    )
+                )
+                
+                if tentativa < max_tentativas - 1:
+                    tempo_espera = 1
+                    print(f"[AVISO] Aguardando {tempo_espera}s antes de tentar autocorreção...")
+                    time.sleep(tempo_espera)
         except Exception as e:
-            print(f"[AVISO] Tentativa {tentativa+1}/{max_tentativas} falhou na fatia de teoria: {e}")
+            print(f"[AVISO] Chamada da API falhou na tentativa {tentativa+1}/{max_tentativas} na fatia de teoria: {e}")
             if tentativa < max_tentativas - 1:
                 tempo_espera = 2 ** tentativa
                 print(f"[AVISO] Aguardando {tempo_espera}s antes de tentar novamente...")
                 time.sleep(tempo_espera)
             else:
                 print(f"[ERRO] Todas as {max_tentativas} tentativas falharam na fatia de teoria: {e}")
-                return f"# Falha na geracao do subtopico apos {max_tentativas} tentativas: {e}"
+                return ultimo_codigo if ultimo_codigo else f"# Falha na geracao do subtopico apos {max_tentativas} tentativas: {e}"
+
+    print(f"[ALERTA] Excedeu o número máximo de tentativas de autocorreção na fatia de teoria. Retornando o último código gerado.")
+    return ultimo_codigo
 
 # ==============================================================================
 # FASE B: FUNÇÃO ESPECIALISTA EM PROCESSAR A FATIA DE EXERCÍCIOS
@@ -222,27 +283,106 @@ def programar_fatia_exercicios(dados_exercicios: dict) -> str:
     )
     
     max_tentativas = 5
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text=json.dumps(dados_exercicios, ensure_ascii=False)),
+                types.Part.from_text(text=prompt)
+            ]
+        )
+    ]
+    
+    ultimo_codigo = ""
+    
     for tentativa in range(max_tentativas):
         try:
             resposta = client.models.generate_content(
                 model="gemini-3.1-flash-lite",
-                contents=[json.dumps(dados_exercicios, ensure_ascii=False), prompt],
+                contents=contents,
                 config=config
             )
             
-            match = re.search(r"```python\s*(.*?)\s*```", resposta.text, re.DOTALL)
-            return match.group(1).strip() if match else resposta.text.strip()
+            resposta_texto = resposta.text
+            match = re.search(r"```python\s*(.*?)\s*```", resposta_texto, re.DOTALL)
+            codigo_gerado = match.group(1).strip() if match else resposta_texto.strip()
+            ultimo_codigo = codigo_gerado
+            
+            # Validação (passando dados_exercicios nos globals mockados para evitar NameError)
+            ok, erro_msg = validar_fatia(codigo_gerado, extra_globals={'dados_exercicios': dados_exercicios})
+            if ok:
+                print(f"[OK] Fatia de exercicios gerada e validada com sucesso na tentativa {tentativa+1}.")
+                return codigo_gerado
+            else:
+                print(f"[AVISO] Tentativa {tentativa+1}/{max_tentativas} falhou na validação de código de exercicios. Erro:\n{erro_msg}")
+                
+                # Prepara o prompt de autocorreção
+                prompt_correcao = f"""[MENSAGEM DE ERRO NA VALIDAÇÃO]
+O código Python gerado anteriormente falhou nos testes de compilação ou execução simulada com o seguinte erro:
+---
+{erro_msg}
+---
+
+Por favor, analise a mensagem de erro acima e corrija o código gerado.
+Instruções de autocorreção:
+1. O dicionário de exercícios chamado 'dados_exercicios' já está disponível no escopo do Streamlit. Acesse os enunciados, dicas, alternativas e gabaritos dinamicamente a partir de 'dados_exercicios' (tolerância zero para hardcoding dos dados do caderno).
+2. Acesse chaves do dicionário de forma segura utilizando .get() (ex: questao.get("dica", "...")).
+3. Certifique-se de que todas as strings de texto longas sejam raw strings válidas.
+4. NUNCA termine uma raw string com uma barra invertida (ex: r"texto\").
+5. NUNCA use 'with' com st.info, st.warning, st.error ou st.success.
+6. O código gerado deve ser sintaticamente correto para o Python 3.12+.
+
+Retorne APENAS o código Python corrigido completo dentro do bloco:
+```python
+# Seu código corrigido aqui
+```"""
+                # Registra o histórico da conversa
+                contents.append(
+                    types.Content(
+                        role="model",
+                        parts=[types.Part.from_text(text=resposta_texto)]
+                    )
+                )
+                contents.append(
+                    types.Content(
+                        role="user",
+                        parts=[types.Part.from_text(text=prompt_correcao)]
+                    )
+                )
+                
+                if tentativa < max_tentativas - 1:
+                    tempo_espera = 1
+                    print(f"[AVISO] Aguardando {tempo_espera}s antes de tentar autocorreção...")
+                    time.sleep(tempo_espera)
         except Exception as e:
-            print(f"[AVISO] Tentativa {tentativa+1}/{max_tentativas} falhou na fatia de exercicios: {e}")
+            print(f"[AVISO] Chamada da API falhou na tentativa {tentativa+1}/{max_tentativas} na fatia de exercicios: {e}")
             if tentativa < max_tentativas - 1:
                 tempo_espera = 2 ** tentativa
                 print(f"[AVISO] Aguardando {tempo_espera}s antes de tentar novamente...")
                 time.sleep(tempo_espera)
             else:
                 print(f"[ERRO] Todas as {max_tentativas} tentativas falharam na fatia de exercicios: {e}")
-                return f"# Falha na geracao de exercicios apos {max_tentativas} tentativas: {e}"
+                return ultimo_codigo if ultimo_codigo else f"# Falha na geracao de exercicios apos {max_tentativas} tentativas: {e}"
 
-def validar_execucao_codigo(codigo_python: str):
+    print(f"[ALERTA] Excedeu o número máximo de tentativas de autocorreção na fatia de exercicios. Retornando o último código gerado.")
+    return ultimo_codigo
+
+def validar_sintaxe(codigo_python: str) -> tuple[bool, str]:
+    """
+    Verifica se o código possui erros de sintaxe sem executá-lo.
+    Retorna (True, "") se estiver tudo ok, ou (False, "mensagem de erro") caso contrário.
+    """
+    import ast
+    try:
+        ast.parse(codigo_python)
+        return True, ""
+    except SyntaxError as se:
+        erro_msg = f"SyntaxError na linha {se.lineno}, coluna {se.offset}: {se.msg}\nTrecho: {se.text}"
+        return False, erro_msg
+    except Exception as e:
+        return False, f"Erro ao analisar sintaxe: {e}"
+
+def validar_execucao_codigo(codigo_python: str, extra_globals: dict = None):
     """
     Tenta executar o código gerado em um ambiente mockado para detectar erros de runtime
     (como chamadas de layout inválidas no Plotly, erros de tipo, variáveis indefinidas, etc.)
@@ -257,8 +397,24 @@ def validar_execucao_codigo(codigo_python: str):
     import json
     import base64
     
-    # 1. Definição do Mock de Streamlit e Valores
-    class MockValue:
+    # 1. Definição do Mock de Streamlit e Valores em uma classe unificada robusta
+    class MockStreamlitElement:
+        def __getattr__(self, name): return MockStreamlitElement()
+        def __enter__(self): return self
+        def __exit__(self, exc_type, exc_val, exc_tb): pass
+        def __call__(self, *args, **kwargs): return MockStreamlitElement()
+        def __iter__(self): return iter([MockStreamlitElement(), MockStreamlitElement()])
+        
+        # Operações de string comuns (evita AttributeError quando a IA trata retorno de widget como string)
+        def split(self, *args, **kwargs): return [self]
+        def strip(self, *args, **kwargs): return self
+        def lower(self, *args, **kwargs): return self
+        def upper(self, *args, **kwargs): return self
+        def replace(self, *args, **kwargs): return self
+        def startswith(self, *args, **kwargs): return False
+        def endswith(self, *args, **kwargs): return False
+        
+        # Operações matemáticas e operadores (evita erros ao tratar retorno de widget como número)
         def __add__(self, other): return self
         def __radd__(self, other): return self
         def __sub__(self, other): return self
@@ -275,7 +431,6 @@ def validar_execucao_codigo(codigo_python: str):
         def __getitem__(self, item): return self
         def __setitem__(self, key, value): pass
         def __len__(self): return 1
-        def __iter__(self): return iter([self])
         def __lt__(self, other): return False
         def __le__(self, other): return False
         def __gt__(self, other): return False
@@ -286,25 +441,18 @@ def validar_execucao_codigo(codigo_python: str):
         def __int__(self): return 1
         def __str__(self): return "1.0"
 
-    class MockStreamlitWidget:
-        def __getattr__(self, name): return MockStreamlitWidget()
-        def __enter__(self): return self
-        def __exit__(self, exc_type, exc_val, exc_tb): pass
-        def __call__(self, *args, **kwargs): return MockValue()
-        def __iter__(self): return iter([MockStreamlitWidget(), MockStreamlitWidget()])
-
     class MockStreamlit:
         def __init__(self):
-            self.sidebar = MockStreamlitWidget()
+            self.sidebar = MockStreamlitElement()
         def __getattr__(self, name):
             if name in ['columns', 'tabs']:
                 def func(spec, *args, **kwargs):
                     if isinstance(spec, int):
-                        return [MockStreamlitWidget() for _ in range(spec)]
+                        return [MockStreamlitElement() for _ in range(spec)]
                     else:
-                        return [MockStreamlitWidget() for _ in range(len(spec))]
+                        return [MockStreamlitElement() for _ in range(len(spec))]
                 return func
-            return MockStreamlitWidget()
+            return MockStreamlitElement()
 
     # Mocks para Matplotlib / Seaborn
     class MockPlot:
@@ -328,13 +476,34 @@ def validar_execucao_codigo(codigo_python: str):
         '__name__': '__main__'
     }
     
+    if extra_globals:
+        globals_dict.update(extra_globals)
+        
     # Executa o código. Se disparar qualquer erro, nós capturamos e levantamos.
     exec(codigo_python, globals_dict)
+
+def validar_fatia(codigo_fatia: str, extra_globals: dict = None) -> tuple[bool, str]:
+    """
+    Verifica a sintaxe e tenta executar a fatia de código em ambiente mockado.
+    Retorna (True, "") em caso de sucesso, ou (False, "mensagem de erro") se houver falha.
+    """
+    ok_sintaxe, erro_sintaxe = validar_sintaxe(codigo_fatia)
+    if not ok_sintaxe:
+        return False, erro_sintaxe
+    
+    try:
+        validar_execucao_codigo(codigo_fatia, extra_globals=extra_globals)
+        return True, ""
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        erro_exec = f"Erro de Execução ({type(e).__name__}): {e}\n\nTraceback completo:\n{tb}"
+        return False, erro_exec
 
 # ==============================================================================
 # FASE C: ORQUESTRADOR LOCAL DE MONTAGEM E COMPILAÇÃO (PYTHON SEWING)
 # ==============================================================================
-def compilar_aula_completa_por_fatias(caminho_teoria_lapidada: str, caminho_exercicios: str, motor_grafico: str = "plotly", cor_principal: str = "#1E3A8A", cor_critica: str = "#991B1B"):
+def compilar_aula_completa_por_fatias(caminho_teoria_lapidada: str, caminho_exercicios: str, motor_grafico: str = "plotly", cor_principal: str = "#1E3A8A", cor_critica: str = "#991B1B", cor_secundaria: str = "#10B981", cor_alerta: str = "#F59E0B"):
     if not os.path.exists(caminho_teoria_lapidada) or not os.path.exists(caminho_exercicios):
         print("[ERRO] Erro critico: Payloads de entrada ausentes no diretorio.")
         return
@@ -391,8 +560,8 @@ st.markdown('<div class="premium-subtitle">Conteúdo Acadêmico Digital e Simula
 
 # Definição de Cores Globais da Paleta Premium
 PRIMARY_BLUE = "{cor_principal}"
-SECONDARY_GREEN = "#10B981"
-WARNING_AMBER = "#F59E0B"
+SECONDARY_GREEN = "{cor_secundaria}"
+WARNING_AMBER = "{cor_alerta}"
 CRITICAL_RED = "{cor_critica}"
 
 # Criação das Duas Grandes Abas Globais
@@ -414,7 +583,7 @@ with tab_conteudo:
         chave_str = str(idx + 1)
         nome_simulador = simuladores_dict.get(chave_str, "")
         
-        fatia_teoria_codigo = programar_fatia_teoria(pagina, nome_simulador=nome_simulador, motor_grafico=motor_grafico, chave_suffix=f"subtopico_{idx + 1}", cor_principal=cor_principal, cor_critica=cor_critica)
+        fatia_teoria_codigo = programar_fatia_teoria(pagina, nome_simulador=nome_simulador, motor_grafico=motor_grafico, chave_suffix=f"subtopico_{idx + 1}", cor_principal=cor_principal, cor_critica=cor_critica, cor_secundaria=cor_secundaria, cor_alerta=cor_alerta)
         
         # AJUSTE DEFENSIVO DE INDENTAÇÃO: Remove recuo base indesejado que a IA possa ter gerado
         linhas = fatia_teoria_codigo.split("\n")

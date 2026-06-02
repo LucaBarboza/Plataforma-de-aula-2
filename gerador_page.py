@@ -314,11 +314,15 @@ def run_page():
 
         st.markdown("---")
         st.markdown("##### 🎨 Identidade Visual (Cores)")
-        col_c1, col_c2 = st.columns(2)
+        col_c1, col_c2, col_c3, col_c4 = st.columns(4)
         with col_c1:
-            cor_principal = st.color_picker("Cor Azul Primária (Identidade da Aula)", value="#1E3A8A")
+            cor_principal = st.color_picker("Cor Primária (Identidade)", value="#1E3A8A")
         with col_c2:
-            cor_critica = st.color_picker("Cor Crítica (Região de Rejeição / Alerta)", value="#991B1B")
+            cor_secundaria = st.color_picker("Cor Secundária (Gráficos/Sucesso)", value="#10B981")
+        with col_c3:
+            cor_alerta = st.color_picker("Cor de Alerta (Aviso/Atenção)", value="#F59E0B")
+        with col_c4:
+            cor_critica = st.color_picker("Cor Crítica (Erro/Rejeição)", value="#991B1B")
 
         st.markdown("##### ✍️ Diretrizes de Estilo Livres")
         diretrizes_adicionais = st.text_area(
@@ -495,6 +499,10 @@ def run_page():
                 # Substituições de Cores Hexadecimais
                 if cor_principal != "#1E3A8A":
                     diretrizes_texto = diretrizes_texto.replace('"PRIMARY_BLUE": "#1E3A8A"', f'"PRIMARY_BLUE": "{cor_principal}"')
+                if cor_secundaria != "#10B981":
+                    diretrizes_texto = diretrizes_texto.replace('"SECONDARY_GREEN": "#10B981"', f'"SECONDARY_GREEN": "{cor_secundaria}"')
+                if cor_alerta != "#F59E0B":
+                    diretrizes_texto = diretrizes_texto.replace('"WARNING_AMBER": "#F59E0B"', f'"WARNING_AMBER": "{cor_alerta}"')
                 if cor_critica != "#991B1B":
                     diretrizes_texto = diretrizes_texto.replace('"CRITICAL_RED": "#991B1B"', f'"CRITICAL_RED": "{cor_critica}"')
 
@@ -619,7 +627,15 @@ def run_page():
             from gerador_interface import compilar_aula_completa_por_fatias
             
             t_start_interface = time.time()
-            caminho_script_gerado = compilar_aula_completa_por_fatias(os.path.join("cache", "payload_teoria_gigante.json"), os.path.join("cache", "payload_exercicios.json"), motor_grafico="plotly", cor_principal=cor_principal, cor_critica=cor_critica)
+            caminho_script_gerado = compilar_aula_completa_por_fatias(
+                os.path.join("cache", "payload_teoria_gigante.json"),
+                os.path.join("cache", "payload_exercicios.json"),
+                motor_grafico="plotly",
+                cor_principal=cor_principal,
+                cor_critica=cor_critica,
+                cor_secundaria=cor_secundaria,
+                cor_alerta=cor_alerta
+            )
             t_end_interface = time.time()
             
             status_box.write("✅ Arquivo Python executável gerado fisicamente na pasta `/aulas`!")
