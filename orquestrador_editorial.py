@@ -40,6 +40,8 @@ def lapidar_conteudo_global(caminho_payload_teoria: str):
     with open(caminho_payload_teoria, "r", encoding="utf-8") as f:
         payload_bruto = json.load(f)
 
+    dados_entrada_str = json.dumps(payload_bruto, ensure_ascii=False)
+
     print("\n[Agente 3.5] Assumindo o controle editorial. Unificando e eliminando repetições da aula...")
 
     prompt_editorial = f"""
@@ -99,7 +101,6 @@ Sua missão é atuar como editor unificador: você deve lapidar, costurar e orga
     )
 
     try:
-        dados_entrada_str = json.dumps(payload_bruto, ensure_ascii=False)
         resposta = client.models.generate_content(
             model="gemini-3.1-flash-lite",
             contents=[dados_entrada_str, prompt_editorial],
