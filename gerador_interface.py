@@ -111,7 +111,11 @@ def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_gra
      
     6. PROIBIÇÃO DE SCIKIT-LEARN: É terminantemente proibido importar, utilizar ou depender de `sklearn` ou `scikit-learn` no código gerado. Para qualquer cálculo estatístico ou ajuste de regressão linear nos simuladores, utilize `scipy.stats` (como `stats.linregress`) ou álgebra linear/cálculo manual com `numpy` (ambas já estão importadas no script pai).
     
-    7. Escreva o seu código iniciando no recuo base de 0 espaços. O orquestrador cuidará do alinhamento.
+    7. EVITAR TRIPLE QUOTES QUEBRADOS E CARACTERES ESCAPADOS INCORRETOS: Garanta que todas as strings de texto longas geradas em Python sejam raw strings válidas (ex: r\"\"\"texto\"\"\"). Se o texto contiver aspas triplas internas, substitua-as por aspas normais simples ou duplas. Não termine uma raw string com uma barra invertida (ex: r"texto\"), pois isso causa erro de sintaxe no compilador do Python (a barra invertida antes das aspas finais escapa as aspas, deixando a string aberta).
+    
+    8. COMPATIBILIDADE SINTÁTICA TOTAL: Seu código gerado DEVE ser código Python 3.12+ sintaticamente correto. Ele será analisado pelo parser AST do Python. Não inclua comentários fora de blocos válidos, nem códigos incompletos ou blocos interrompidos.
+    
+    9. Escreva o seu código iniciando no recuo base de 0 espaços. O orquestrador cuidará do alinhamento.
     
     Retorne APENAS o código Python puro dentro do bloco de marcação:
     ```python
@@ -193,6 +197,8 @@ def programar_fatia_exercicios(dados_exercicios: dict) -> str:
        - Oculte a resolução detalhada passo a passo dentro de um `st.expander("✅ Ver Resolução Detalhada")` iterando de forma segura sobre a lista obtida por `.get("gabarito_passo_a_passo", [])`.
     3. NÃO inclua importações globais ou redefinição de variáveis globais. O código deve iniciar no recuo de 0 espaços.
     
+    4. SEGURANÇA SINTÁTICA E COMPATIBILIDADE SINTÁTICA TOTAL: Seu código gerado DEVE ser código Python 3.12+ sintaticamente correto. Nunca coloque aspas triplas dentro de outras aspas triplas sem escapar, e evite colocar barras invertidas no final de raw strings (ex: r"texto\"). Não inclua comentários soltos ou blocos incompletos.
+    
     Retorne APENAS o código Python puro dentro do bloco:
     ```python
     # Seu código aqui
@@ -238,6 +244,20 @@ def compilar_aula_completa_por_fatias(caminho_teoria_lapidada: str, caminho_exer
     with open(caminho_exercicios, "r", encoding="utf-8") as f:
         exercicios = json.load(f)
         
+    import base64
+    
+    # Serialização 100% segura dos metadados da aula para evitar SyntaxError por conta de aspas ou caracteres especiais
+    metadata = {
+        "tema_global": teoria["tema_global"],
+        "referencias_bibliograficas_finais": teoria.get("referencias_bibliograficas_finais", [])
+    }
+    metadata_json = json.dumps(metadata, ensure_ascii=False)
+    metadata_b64 = base64.b64encode(metadata_json.encode("utf-8")).decode("utf-8")
+
+    # Serialização 100% segura dos exercícios para evitar quebras por aspas triplas ou caracteres especiais
+    exercicios_json = json.dumps(exercicios, ensure_ascii=False)
+    exercicios_b64 = base64.b64encode(exercicios_json.encode("utf-8")).decode("utf-8")
+
     print(f"\n[OK] [Orquestrador Local] Compilando a aplicacao Streamlit por fatias incrementais usando o motor '{motor_grafico}'...")
     
     # Adiciona imports com base no motor gráfico
@@ -252,6 +272,11 @@ import pandas as pd
 {imports_grafico}
 import scipy.stats as stats
 from scipy.stats import norm
+import base64
+import json
+
+# Carregamento seguro dos metadados da aula para evitar SyntaxError
+metadata = json.loads(base64.b64decode('{metadata_b64}').decode('utf-8'))
 
 # Injeção de Estilos CSS Acadêmicos Premium
 st.markdown(\"\"\"
@@ -261,7 +286,7 @@ st.markdown(\"\"\"
     </style>
 \"\"\", unsafe_allow_html=True)
 
-st.markdown('<div class="premium-title">{teoria['tema_global']}</div>', unsafe_allow_html=True)
+st.markdown(f'<div class="premium-title">{{metadata["tema_global"]}}</div>', unsafe_allow_html=True)
 st.markdown('<div class="premium-subtitle">Conteúdo Acadêmico Digital e Simuladores Integrados</div>', unsafe_allow_html=True)
 
 # Definição de Cores Globais da Paleta Premium
@@ -304,17 +329,12 @@ with tab_conteudo:
         
     # 3. Injeta a Seção ÚNICA de Referências Bibliográficas consolidadas bem no final da primeira Aba
     codigo_completo += "\n    st.markdown('---')\n    st.markdown('##### 📚 Referências Bibliográficas Consolidadas (Rodapé da Aula)')\n"
-    for ref in teoria["referencias_bibliograficas_finais"]:
-        codigo_completo += f"    st.markdown(r'- {ref}')\n"
+    codigo_completo += "    for ref in metadata['referencias_bibliograficas_finais']:\n        st.markdown(f'- {ref}')\n"
 
     # 4. Abre a segunda Aba global e injeta a fatia dos exercícios práticos
     print("   -> Solicitando codificação do caderno de exercícios...")
     codigo_completo += "\nwith tab_exercicios:\n"
-    
-    # Injetamos os dados serializados como string JSON com segurança no escopo do tab_exercicios
-    exercicios_serializados = json.dumps(exercicios, ensure_ascii=False)
-    exercicios_serializados_escapado = exercicios_serializados.replace('"""', '\\"\\"\\"')
-    codigo_completo += f"    import json\n    dados_exercicios = json.loads(r\"\"\"{exercicios_serializados_escapado}\"\"\")\n\n"
+    codigo_completo += f"    import json, base64\n    dados_exercicios = json.loads(base64.b64decode('{exercicios_b64}').decode('utf-8'))\n\n"
     
     fatia_exercicios_codigo = programar_fatia_exercicios(exercicios)
     
@@ -358,7 +378,15 @@ with tab_conteudo:
         py_compile.compile(caminho_final_script, doraise=True)
         print("[OK] Teste de Compilação: Aprovado sem erros de sintaxe!")
     except py_compile.PyCompileError as pye:
-        print(f"[ALERTA] A costura apresentou problemas de compilação: {pye}")
+        print(f"[ERRO] A costura apresentou problemas de compilação: {pye}")
+        if os.path.exists(caminho_final_script):
+            try:
+                os.remove(caminho_final_script)
+            except Exception:
+                pass
+        raise RuntimeError(f"O script gerado contém erro de sintaxe Python e foi removido para evitar falha do app. Detalhes: {pye}")
+
+    return caminho_final_script
 
 if __name__ == "__main__":
     print("[AVISO] A compilação da interface deve ser executada a partir da interface do Streamlit.")
