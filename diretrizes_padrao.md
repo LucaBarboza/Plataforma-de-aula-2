@@ -171,7 +171,7 @@ plt.close(fig) # Liberar memória explicitamente
 
 ### 📊 Cenário B: Se o motor gráfico ativo for PLOTLY
 
-O programador deve forçar uma folha de estilo web premium, fluida e totalmente otimizada para mobile. O layout Plotly deve ser updated estritamente como demonstrado abaixo:
+O programador deve forçar uma folha de estilo web premium, fluida e totalmente otimizada para mobile. O layout Plotly deve ser atualizado estritamente como demonstrado abaixo:
 
 ```python
 import plotly.graph_objects as go

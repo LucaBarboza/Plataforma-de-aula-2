@@ -54,7 +54,7 @@ def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_gra
     if motor_grafico.lower() == "seaborn":
         grafico_especifico = f"""Crie um gráfico Seaborn/Matplotlib premium altamente científico e estilizado. 
         Configure o tema usando `sns.set_theme(style="whitegrid", rc={{"grid.linestyle": "--", "grid.alpha": 0.5, "grid.color": "#E2E8F0", "font.family": "sans-serif", "font.sans-serif": ["Arial", "DejaVu Sans", "Helvetica"]}})` e use a fonte 'sans-serif'.
-        Use `fig, ax = plt.subplots(figsize=(10, 5), dpi=300)` e configure as cores de fundo `fig.patch.set_facecolor('#FFFFFF')` and `ax.set_facecolor('#FFFFFF')`. Garanta a remoção de bordas com `sns.despine(left=True, bottom=False, right=True, top=True)`.
+        Use `fig, ax = plt.subplots(figsize=(10, 5), dpi=300)` e configure as cores de fundo `fig.patch.set_facecolor('#FFFFFF')` e `ax.set_facecolor('#FFFFFF')`. Garanta a remoção de bordas com `sns.despine(left=True, bottom=False, right=True, top=True)`.
         Assegure que as cores usadas sigam a paleta estrita: PRIMARY_BLUE = "{cor_principal}", SECONDARY_GREEN = "#10B981", WARNING_AMBER = "#F59E0B", CRITICAL_RED = "{cor_critica}", LIGHT_SLATE = "#F8FAFC", GRID_GRAY = "#E2E8F0", TEXT_MAIN = "#1E293B", TEXT_MUTED = "#64748B".
         Use títulos de eixos e título principal formatados com tamanho de fonte estrito: título 14 (negrito, TEXT_MAIN), eixos 11 (TEXT_MAIN), ticks 9 (TEXT_MUTED) e legenda 9 (TEXT_MUTED) em fundo LIGHT_SLATE com borda GRID_GRAY.
         Renderize no Streamlit usando `st.pyplot(fig)`. Libere a memória no final chamando `plt.close(fig)`."""
@@ -66,7 +66,7 @@ def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_gra
         - `margin=dict(l=55, r=30, t=65, b=55, pad=4)`
         - Fundo do plot (`plot_bgcolor`) e do papel (`paper_bgcolor`) brancos ou transparentes. Nunca use fundos pretos ou coloridos.
         - Título com tag HTML `<b>` e fonte de tamanho 14, cor "#1E293B", família "Arial, sans-serif", alinhado à esquerda: `title=dict(text="<b>Título Estruturado</b>", font=dict(size=14, color="#1E293B", family="Arial, sans-serif"), x=0.0, y=0.95)`.
-        - Eixos 2D configurados com `fixedrange=True` para estabilidade mobile nas propriedades de `xaxis` e `yaxis`. Se for gráfico 3D, nunca use `fixedrange` em scene, xaxis, yaxis ou zaxis.
+        - Eixos 2D configurados with `fixedrange=True` para estabilidade mobile nas propriedades de `xaxis` e `yaxis`. Se for gráfico 3D, nunca use `fixedrange` em scene, xaxis, yaxis ou zaxis.
         - Eixos com títulos de tamanho 11, cor "#1E293B", família "Arial, sans-serif", e tickfont com tamanho 9, cor "#64748B", família "Arial, sans-serif". Defina gridcolor="#E2E8F0" e zerolinecolor="#CBD5E1".
         - Legenda horizontal no topo do gráfico para economizar espaço e evitar desalinhamento: `legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1.0, font=dict(size=9, color="#64748B", family="Arial, sans-serif"), bgcolor="rgba(255, 255, 255, 0.8)", bordercolor="#E2E8F0", borderwidth=1)`.
         - Caixa de dica flutuante (hoverlabel) customizada: `hoverlabel=dict(bgcolor="#FFFFFF", font_size=12, font_color="#1E293B", font_family="Arial, sans-serif")`.
@@ -204,7 +204,7 @@ def programar_fatia_exercicios(dados_exercicios: dict) -> str:
        - Oculte o gabarito comentado dentro de um `st.expander("✅ Ver Gabarito Comentado")`. Você DEVE extrair as chaves do dicionário usando sempre o método seguro `.get("gabarito_comentado", "Gabarito indisponível")` para evitar KeyErrors.
     2. Crie uma interface para iterar sobre a lista 'dados_exercicios["questoes_discursivas"]'.
        - Crie um campo `st.text_area("Sua resposta:", key=...)`.
-       - Renderize a dica de forma segura com `.get("dica", "Dica indisponível")` num botão de dica.
+       - Renderize a dica de forma segura with `.get("dica", "Dica indisponível")` num botão de dica.
        - Oculte a resolução detalhada passo a passo dentro de um `st.expander("✅ Ver Resolução Detalhada")` iterando de forma segura sobre a lista obtida por `.get("gabarito_passo_a_passo", [])`.
     3. NÃO inclua importações globais ou redefinição de variáveis globais. O código deve iniciar no recuo de 0 espaços.
     
@@ -384,7 +384,7 @@ st.markdown(\"\"\"
         .premium-title {{ font-size: 2.2rem; font-weight: 800; color: {cor_principal}; margin-bottom: 0.2rem; }}
         .premium-subtitle {{ font-size: 1.1rem; color: #64748B; margin-bottom: 1.5rem; font-style: italic; }}
     </style>
-\"\"\", unsafe_allow_html=True)
+    \"\"\", unsafe_allow_html=True)
 
 st.markdown(f'<div class="premium-title">{{metadata["tema_global"]}}</div>', unsafe_allow_html=True)
 st.markdown('<div class="premium-subtitle">Conteúdo Acadêmico Digital e Simuladores Integrados</div>', unsafe_allow_html=True)
