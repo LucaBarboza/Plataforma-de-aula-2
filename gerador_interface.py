@@ -59,7 +59,7 @@ def programar_fatia_teoria(dados_subtopico: dict, nome_simulador: str, motor_gra
         Renderize no Streamlit usando `st.pyplot(fig)`. Libere a memória no final chamando `plt.close(fig)`."""
     else:
         grafico_especifico = f"""Crie um gráfico Plotly premium altamente interativo e condizente com a proposta. 
-        Configure o gráfico com eixos travados para mobile (`fixedrange=True` nas propriedades de `xaxis` e `yaxis` do `fig.update_layout()`, NUNCA no layout raiz).
+        Configure o gráfico com eixos travados para mobile se for um gráfico 2D (`fixedrange=True` nas propriedades de `xaxis` e `yaxis` do `fig.update_layout()`, NUNCA no layout raiz). Se for um gráfico 3D (que utiliza scene=dict(...)), NUNCA use fixedrange em scene, xaxis, yaxis ou zaxis, pois o Plotly não suporta essa propriedade em gráficos 3D e lançará um ValueError.
         Assegure que as cores usadas sigam a paleta estrita: PRIMARY_BLUE = "#1E3A8A", SECONDARY_GREEN = "#10B981", WARNING_AMBER = "#F59E0B", CRITICAL_RED = "#991B1B".
         Renderize no Streamlit usando `st.plotly_chart(fig, use_container_width=True, key=r"plotly_chart_{chave_suffix}")`."""
 
@@ -231,6 +231,95 @@ def programar_fatia_exercicios(dados_exercicios: dict) -> str:
                 print(f"[ERRO] Todas as {max_tentativas} tentativas falharam na fatia de exercicios: {e}")
                 return f"# Falha na geracao de exercicios apos {max_tentativas} tentativas: {e}"
 
+def validar_execucao_codigo(codigo_python: str):
+    """
+    Tenta executar o código gerado em um ambiente mockado para detectar erros de runtime
+    (como chamadas de layout inválidas no Plotly, erros de tipo, variáveis indefinidas, etc.)
+    antes de salvar o arquivo no disco.
+    """
+    import numpy as np
+    import pandas as pd
+    import scipy.stats as stats
+    from scipy.stats import norm
+    import plotly.graph_objects as go
+    import plotly.express as px
+    import json
+    import base64
+    
+    # 1. Definição do Mock de Streamlit e Valores
+    class MockValue:
+        def __add__(self, other): return self
+        def __radd__(self, other): return self
+        def __sub__(self, other): return self
+        def __rsub__(self, other): return self
+        def __mul__(self, other): return self
+        def __rmul__(self, other): return self
+        def __truediv__(self, other): return self
+        def __rtruediv__(self, other): return self
+        def __pow__(self, other): return self
+        def __rpow__(self, other): return self
+        def __neg__(self): return self
+        def __pos__(self): return self
+        def __abs__(self): return self
+        def __getitem__(self, item): return self
+        def __setitem__(self, key, value): pass
+        def __len__(self): return 1
+        def __iter__(self): return iter([self])
+        def __lt__(self, other): return False
+        def __le__(self, other): return False
+        def __gt__(self, other): return False
+        def __ge__(self, other): return False
+        def __eq__(self, other): return True
+        def __ne__(self, other): return False
+        def __float__(self): return 1.0
+        def __int__(self): return 1
+        def __str__(self): return "1.0"
+
+    class MockStreamlitWidget:
+        def __getattr__(self, name): return MockStreamlitWidget()
+        def __enter__(self): return self
+        def __exit__(self, exc_type, exc_val, exc_tb): pass
+        def __call__(self, *args, **kwargs): return MockValue()
+        def __iter__(self): return iter([MockStreamlitWidget(), MockStreamlitWidget()])
+
+    class MockStreamlit:
+        def __init__(self):
+            self.sidebar = MockStreamlitWidget()
+        def __getattr__(self, name):
+            if name in ['columns', 'tabs']:
+                def func(spec, *args, **kwargs):
+                    if isinstance(spec, int):
+                        return [MockStreamlitWidget() for _ in range(spec)]
+                    else:
+                        return [MockStreamlitWidget() for _ in range(len(spec))]
+                return func
+            return MockStreamlitWidget()
+
+    # Mocks para Matplotlib / Seaborn
+    class MockPlot:
+        def __getattr__(self, name):
+            return lambda *args, **kwargs: MockPlot()
+        def __enter__(self): return self
+        def __exit__(self, exc_type, exc_val, exc_tb): pass
+
+    globals_dict = {
+        'st': MockStreamlit(),
+        'np': np,
+        'pd': pd,
+        'go': go,
+        'px': px,
+        'stats': stats,
+        'norm': norm,
+        'plt': MockPlot(),
+        'sns': MockPlot(),
+        'json': json,
+        'base64': base64,
+        '__name__': '__main__'
+    }
+    
+    # Executa o código. Se disparar qualquer erro, nós capturamos e levantamos.
+    exec(codigo_python, globals_dict)
+
 # ==============================================================================
 # FASE C: ORQUESTRADOR LOCAL DE MONTAGEM E COMPILAÇÃO (PYTHON SEWING)
 # ==============================================================================
@@ -385,6 +474,20 @@ with tab_conteudo:
             except Exception:
                 pass
         raise RuntimeError(f"O script gerado contém erro de sintaxe Python e foi removido para evitar falha do app. Detalhes: {pye}")
+
+    # Teste de execução simulado em Sandbox
+    try:
+        validar_execucao_codigo(codigo_completo)
+        print("[OK] Teste de Execução Simulado: Passou sem erros de runtime!")
+    except Exception as e:
+        print(f"[ERRO] Teste de Execução Simulado falhou: {e}")
+        if os.path.exists(caminho_final_script):
+            try:
+                os.remove(caminho_final_script)
+            except Exception:
+                pass
+        # Captura apenas o nome do erro e a mensagem para evitar estourar limites do terminal
+        raise RuntimeError(f"O script gerado contém erros de execução (ex: Plotly/Pandas) e foi removido para evitar falhas no carregamento. Detalhes: {type(e).__name__}: {str(e)[:500]}")
 
     return caminho_final_script
 
