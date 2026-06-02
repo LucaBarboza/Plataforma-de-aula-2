@@ -14,9 +14,20 @@ from schemas import SubtopicoValidado
 # FALLBACK DE SEGURANÇA PARA A CHAVE DE API (GEMINI_API_KEY)
 # ==============================================================================
 def carregar_chave_api():
-    """Garante a leitura da API key a partir do ambiente ou do secrets da Streamlit."""
+    """Garante a leitura da API key a partir do ambiente, do st.secrets (Streamlit Cloud) ou do secrets.toml local."""
     if "GEMINI_API_KEY" in os.environ and os.environ["GEMINI_API_KEY"].strip():
         return True
+        
+    # Tenta obter do st.secrets do Streamlit
+    try:
+        import streamlit as st
+        if "GEMINI_API_KEY" in st.secrets:
+            val = st.secrets["GEMINI_API_KEY"]
+            if val and val.strip():
+                os.environ["GEMINI_API_KEY"] = val.strip()
+                return True
+    except Exception:
+        pass
         
     # Tenta ler do secrets.toml da pasta local
     path = os.path.join(".streamlit", "secrets.toml")

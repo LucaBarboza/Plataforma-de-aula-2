@@ -42,8 +42,7 @@ def inicializar_e_indexar(nome_professor: str, codigo_disciplina: str, pasta_liv
                 print(f"✅ Store encontrada no servidor do Google: {store_alvo.name}")
                 break
     except Exception as e:
-        print(f"Erro ao listar stores: {e}")
-        sys.exit(1)
+        raise RuntimeError(f"Erro ao listar stores: {e}")
         
     if not store_alvo:
         print(f"⚠️ Store não existente. Criando nova store corporativa...")

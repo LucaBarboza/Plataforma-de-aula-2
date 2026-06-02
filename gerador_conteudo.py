@@ -17,9 +17,20 @@ from revisor_notacao import auditar_subtopico_local
 # FALLBACK DE SEGURANÇA PARA A CHAVE DE API (GEMINI_API_KEY)
 # ==============================================================================
 def carregar_chave_api():
-    """Garante a leitura da API key a partir do ambiente ou do secrets da Streamlit."""
+    """Garante a leitura da API key a partir do ambiente, do st.secrets (Streamlit Cloud) ou do secrets.toml local."""
     if "GEMINI_API_KEY" in os.environ and os.environ["GEMINI_API_KEY"].strip():
         return True
+        
+    # Tenta obter do st.secrets do Streamlit
+    try:
+        import streamlit as st
+        if "GEMINI_API_KEY" in st.secrets:
+            val = st.secrets["GEMINI_API_KEY"]
+            if val and val.strip():
+                os.environ["GEMINI_API_KEY"] = val.strip()
+                return True
+    except Exception:
+        pass
         
     # Tenta ler do secrets.toml da pasta local
     path = os.path.join(".streamlit", "secrets.toml")
@@ -64,8 +75,7 @@ def gerar_conteudo_aula(nome_professor: str, codigo_disciplina: str, tema_solici
     
     # Garante que temos a chave configurada
     if not os.environ.get("GEMINI_API_KEY"):
-        print("[ERRO] Erro catastrófico: Chave de API 'GEMINI_API_KEY' não configurada no ambiente nem encontrada em .streamlit/secrets.toml")
-        sys.exit(1)
+        raise ValueError("Chave de API 'GEMINI_API_KEY' não configurada. Configure a chave nos Secrets do Streamlit ou no ambiente.")
 
     try:
         client = genai.Client()
@@ -97,8 +107,7 @@ def gerar_conteudo_aula(nome_professor: str, codigo_disciplina: str, tema_solici
         print(f"[ALERTA] Alerta ao buscar stores no Google Cloud: {e}")
             
     if not store_names:
-        print(f"[ERRO] Erro crítico: Nenhuma base de dados RAG ('{NOME_STORE}' ou '{NOME_STORE_FALLBACK}') foi encontrada.")
-        return None
+        print(f"[AVISO] Nenhuma base de dados RAG ('{NOME_STORE}' ou '{NOME_STORE_FALLBACK}') foi encontrada. Continuando em modo sem RAG...")
 
     # 2. Carrega a ementa oficial como guia (fornecido obrigatoriamente via Streamlit)
     if not ementa_pdf_path:
@@ -231,18 +240,35 @@ Cada item da lista deve focar intensamente em um único conceito específico, ga
             tentativa += 1
             print(f"      [Tentativa {tentativa}/{MAX_TENTATIVAS_REVISAO}] Enviando para o Escritor...")
 
+            if store_names:
+                diretriz_veracidade = "Baseie-se estritamente e exclusivamente nas informações contidas nos documentos do RAG e nos materiais do professor fornecidos pelo File Search. É terminantemente proibido inventar teoremas, deduzir propriedades sem fundamentação teórica nas fontes recuperadas, ou citar livros que não constem de fato nas referências obtidas."
+                contexto_rag_descricao = "os documentos recuperados da base RAG (File Search)"
+                tools_config = [
+                    types.Tool(
+                        file_search=types.FileSearch(
+                            file_search_store_names=store_names,
+                            metadata_filter=f'discipline="{codigo_disciplina.upper().strip()}"',
+                            top_k=45
+                        )
+                    )
+                ]
+            else:
+                diretriz_veracidade = "Como não há base RAG de apoio disponível, baseie-se no conhecimento estatístico consolidado da literatura acadêmica padrão (ex: Bussab & Morettin, Morettin & Singer, etc.). É terminantemente proibido inventar teoremas ou deduzir propriedades errôneas. Cite obras e páginas reais e verossímeis nas referências bibliográficas do retorno."
+                contexto_rag_descricao = "o conhecimento estatístico consolidado da literatura acadêmica padrão"
+                tools_config = None
+
             prompt_escritor = fr"""
 Você é um Professor Titular de Estatística e co-autor de livros didáticos clássicos e rigorosos de nível universitário.
 
 ### CONTEXTO E MISSÃO
-Você receberá as Diretrizes de Notação e Design do professor, os documentos recuperados da base RAG (File Search) e um [SUBTÓPICO_ALVO] que integra o [TÓPICO_DA_AULA].
+Você receberá as Diretrizes de Notação e Design do professor, {contexto_rag_descricao} e um [SUBTÓPICO_ALVO] que integra o [TÓPICO_DA_AULA].
 Sua missão é atuar como o produtor científico principal do conteúdo teórico: você deve redigir a teoria acadêmica e formalismo matemático de forma extremamente completa e exaustiva para o [SUBTÓPICO_ALVO], preenchendo rigorosamente a estrutura 'SubtopicoValidado'.
 
 ---
 
 ### DIRETRIZES DE ESCOPO E EXAUSTIVIDADE (MANDATÓRIO)
 1. Escrita Exaustiva de Livro: Você tem um limite de saída de 65.000 tokens. USE ESTE ESPAÇO PARA SER O MÁXIMO POSSÍVEL EXAUSTIVO. É OBRIGATÓRIO escrever o máximo de texto, explicações e detalhes analíticos possíveis. Proibido resumir, simplificar ou abreviar em nenhuma hipótese.
-2. Regra de Ouro de Veracidade: Baseie-se estritamente e exclusivamente nas informações contidas nos documentos do RAG e nos materiais do professor fornecidos pelo File Search. É terminantemente proibido inventar teoremas, deduzir propriedades sem fundamentação teórica nas fontes recuperadas, ou citar livros que não constem de fato nas referências obtidas.
+2. Regra de Ouro de Veracidade: {diretriz_veracidade}
 3. Rigor Científico e LaTeX: Toda notação matemática formal, hipóteses, variabilidades, distribuições e deduções devem ser apresentadas com rigor absoluto em LaTeX estruturado ($$ para destaque centralizado ou $ para linha).
 
 ---
@@ -284,15 +310,7 @@ Sua missão é atuar como o produtor científico principal do conteúdo teórico
 """
 
             config_escritor = types.GenerateContentConfig(
-                tools=[
-                    types.Tool(
-                        file_search=types.FileSearch(
-                            file_search_store_names=store_names,
-                            metadata_filter=f'discipline="{codigo_disciplina.upper().strip()}"',
-                            top_k=45
-                        )
-                    )
-                ],
+                tools=tools_config,
                 thinking_config=types.ThinkingConfig(thinking_level="high"),
                 temperature=1.0,
                 response_mime_type="application/json",

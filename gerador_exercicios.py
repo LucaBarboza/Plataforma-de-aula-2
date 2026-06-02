@@ -12,9 +12,20 @@ from schemas import CadernoExerciciosValidado
 # FALLBACK DE SEGURANÇA PARA A CHAVE DE API (GEMINI_API_KEY)
 # ==============================================================================
 def carregar_chave_api():
-    """Garante a leitura da API key a partir do ambiente ou do secrets da Streamlit."""
+    """Garante a leitura da API key a partir do ambiente, do st.secrets (Streamlit Cloud) ou do secrets.toml local."""
     if "GEMINI_API_KEY" in os.environ and os.environ["GEMINI_API_KEY"].strip():
         return True
+        
+    # Tenta obter do st.secrets do Streamlit
+    try:
+        import streamlit as st
+        if "GEMINI_API_KEY" in st.secrets:
+            val = st.secrets["GEMINI_API_KEY"]
+            if val and val.strip():
+                os.environ["GEMINI_API_KEY"] = val.strip()
+                return True
+    except Exception:
+        pass
         
     # Tenta ler do secrets.toml da pasta local
     path = os.path.join(".streamlit", "secrets.toml")
@@ -42,8 +53,7 @@ carregar_chave_api()
 def gerar_caderno_exercicios(caminho_payload_teoria: str, diretrizes_texto: str = None):
     # Garante que temos a chave configurada
     if not os.environ.get("GEMINI_API_KEY"):
-        print("[ERRO] Erro catastrófico: Chave de API 'GEMINI_API_KEY' não configurada no ambiente nem encontrada em .streamlit/secrets.toml")
-        sys.exit(1)
+        raise ValueError("Chave de API 'GEMINI_API_KEY' não configurada. Configure a chave nos Secrets do Streamlit ou no ambiente.")
 
     try:
         client = genai.Client()
