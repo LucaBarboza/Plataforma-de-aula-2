@@ -508,7 +508,7 @@ def run_page():
             from gerador_interface import compilar_aula_completa_por_fatias
             
             t_start_interface = time.time()
-            compilar_aula_completa_por_fatias(os.path.join("cache", "payload_teoria_gigante.json"), os.path.join("cache", "payload_exercicios.json"), motor_grafico="plotly")
+            caminho_script_gerado = compilar_aula_completa_por_fatias(os.path.join("cache", "payload_teoria_gigante.json"), os.path.join("cache", "payload_exercicios.json"), motor_grafico="plotly")
             t_end_interface = time.time()
             
             status_box.write("✅ Arquivo Python executável gerado fisicamente na pasta `/aulas`!")
@@ -526,8 +526,45 @@ def run_page():
             exec_log["tempo_total_segundos"] = round(time.time() - t_inicio_geral_completo, 2)
             exec_log["timestamp_fim"] = time.strftime("%Y-%m-%d %H:%M:%S")
             
+            # Salva o log de última execução para compatibilidade
             with open(os.path.join("cache", "ultimo_log_execucao.json"), "w", encoding="utf-8") as f:
                 json.dump(exec_log, f, indent=4, ensure_ascii=False)
+
+            # Salva o log específico associado à aula para persistência no repositório
+            if caminho_script_gerado:
+                caminho_log_especifico = caminho_script_gerado.replace(".py", ".log.json")
+                try:
+                    with open(caminho_log_especifico, "w", encoding="utf-8") as f:
+                        json.dump(exec_log, f, indent=4, ensure_ascii=False)
+                    status_box.write(f"✅ Relatório de auditoria persistido em '{caminho_log_especifico}'!")
+                except Exception as log_ex:
+                    status_box.write(f"⚠️ Aviso: Não foi possível salvar o log da aula: {log_ex}")
+
+                # Envia os arquivos gerados (.py e .log.json) ao repositório do GitHub
+                try:
+                    from git_integration import commitar_arquivo_github
+                    
+                    status_box.write("🚀 Enviando aula gerada ao repositório GitHub...")
+                    caminho_repositorio_py = os.path.relpath(caminho_script_gerado).replace("\\", "/")
+                    sucesso_py = commitar_arquivo_github(
+                        caminho_local=caminho_script_gerado,
+                        caminho_repositorio=caminho_repositorio_py,
+                        mensagem_commit=f"feat: adiciona aula {caminho_repositorio_py}"
+                    )
+                    
+                    caminho_repositorio_log = os.path.relpath(caminho_log_especifico).replace("\\", "/")
+                    sucesso_log = commitar_arquivo_github(
+                        caminho_local=caminho_log_especifico,
+                        caminho_repositorio=caminho_repositorio_log,
+                        mensagem_commit=f"feat: adiciona log {caminho_repositorio_log}"
+                    )
+                    
+                    if sucesso_py and sucesso_log:
+                        status_box.write("✅ Sucesso! Arquivos salvos permanentemente no seu GitHub.")
+                    else:
+                        status_box.write("⚠️ Aviso: Arquivos gerados localmente, mas não enviados ao GitHub (verifique GITHUB_PAT/GITHUB_REPO nos Secrets).")
+                except Exception as git_ex:
+                    status_box.write(f"⚠️ Erro ao tentar salvar no GitHub: {git_ex}")
 
             status_box.update(label="🎉 Aula Acadêmica Gerada e Compilada com Sucesso!", state="complete")
             st.balloons()
@@ -553,21 +590,49 @@ def run_page():
             st.error(f"Ocorreu um erro no pipeline de inteligência artificial: {ex}")
 
     # Seção de Auditoria e Logs Premium no final da página (Exposição Premium no Streamlit)
-    log_path = os.path.join("cache", "ultimo_log_execucao.json")
-    if os.path.exists(log_path):
+    opcoes_log = {}
+    
+    # 1. Adiciona o log de última execução como padrão se existir
+    path_ultimo = os.path.join("cache", "ultimo_log_execucao.json")
+    if os.path.exists(path_ultimo):
+        opcoes_log["Última Execução"] = path_ultimo
+        
+    # 2. Faz a varredura dinâmica na pasta /aulas por logs específicos de aulas
+    if os.path.exists("aulas"):
+        arquivos_aulas = sorted(os.listdir("aulas"))
+        for f in arquivos_aulas:
+            if f.endswith(".log.json"):
+                caminho_log = os.path.join("aulas", f)
+                try:
+                    with open(caminho_log, "r", encoding="utf-8") as lf:
+                        data = json.load(lf)
+                        tema = data.get("tema", "Sem Tema")
+                        disciplina = data.get("disciplina", "Geral")
+                        match = re.match(r'^aula(\d+)', f, flags=re.IGNORECASE)
+                        num_str = f"Aula {int(match.group(1)):02d}" if match else "Aula"
+                        label_bonito = f"📊 {num_str}: {tema} ({disciplina})"
+                        opcoes_log[label_bonito] = caminho_log
+                except Exception:
+                    pass
+
+    if opcoes_log:
+        st.markdown("---")
+        st.markdown("""
+            <div style="margin-top: 2rem; margin-bottom: 1rem;">
+                <h3 style="color: #1E3A8A; font-weight: 700; margin-bottom: 0.2rem;">📊 Relatório de Auditoria e Logs dos Agentes</h3>
+                <p style="color: #64748B; font-size: 0.95rem; margin-top: 0px;">
+                    Selecione o log de execução de uma aula gerada ou a última execução para detalhamento técnico.
+                </p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        lista_opcoes = list(opcoes_log.keys())
+        log_selecionado_label = st.selectbox("Selecione o Relatório de Auditoria:", options=lista_opcoes, index=0)
+        log_path = opcoes_log[log_selecionado_label]
+        
         try:
             with open(log_path, "r", encoding="utf-8") as f:
                 log_data = json.load(f)
-                
-            st.markdown("---")
-            st.markdown("""
-                <div style="margin-top: 2rem; margin-bottom: 1.5rem;">
-                    <h3 style="color: #1E3A8A; font-weight: 700; margin-bottom: 0.2rem;">📊 Relatório de Auditoria e Logs dos Agentes</h3>
-                    <p style="color: #64748B; font-size: 0.95rem; margin-top: 0px;">
-                        Detalhamento técnico da última execução do pipeline editorial inteligente
-                    </p>
-                </div>
-            """, unsafe_allow_html=True)
             
             # 1. KPIs
             tempo_total = log_data.get("tempo_total_segundos", 0.0)
