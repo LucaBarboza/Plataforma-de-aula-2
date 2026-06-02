@@ -20,6 +20,61 @@ def run_page():
     # Garante a carga da chave de API
     carregar_chave_api()
 
+    # Painel de controle do GitHub na sidebar
+    from git_integration import obter_credencial_github, salvar_credencial_github
+    
+    token_atual, repo_atual, branch_atual = obter_credencial_github()
+    
+    st.sidebar.markdown("""
+        <div style="background-color: #F8FAFC; border-left: 4px solid #1E3A8A; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+            <h4 style="color: #1E3A8A; margin: 0 0 5px 0; font-size: 1.05rem;">🔗 Status do GitHub</h4>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    if token_atual and repo_atual:
+        st.sidebar.success(f"**Conectado**\n\nRepo: `{repo_atual}`\n\nBranch: `{branch_atual}`")
+    else:
+        st.sidebar.warning("⚠️ GitHub não conectado. As aulas serão salvas apenas localmente.")
+        
+    with st.sidebar.expander("⚙️ Configurar Repositório Git", expanded=not (token_atual and repo_atual)):
+        st.write("Insira suas credenciais do GitHub abaixo:")
+        
+        github_pat = st.text_input(
+            "GitHub PAT (Token)",
+            value=token_atual or "",
+            type="password",
+            help="Personal Access Token com permissão 'contents:write'."
+        )
+        
+        github_repo = st.text_input(
+            "Repositório (owner/repo)",
+            value=repo_atual or "",
+            placeholder="Ex: LucaBarboza/Plataforma-de-aula-2",
+            help="Nome do repositório no formato 'usuario/repositorio'."
+        )
+        
+        github_branch = st.text_input(
+            "Branch",
+            value=branch_atual or "main",
+            help="Nome da branch remota."
+        )
+        
+        if st.button("Salvar Credenciais Git", use_container_width=True):
+            if not github_pat.strip():
+                st.error("Token do GitHub é obrigatório.")
+            elif not github_repo.strip():
+                st.error("Nome do repositório é obrigatório.")
+            else:
+                if salvar_credencial_github(github_pat.strip(), github_repo.strip(), github_branch.strip()):
+                    st.success("Credenciais salvas localmente no secrets.toml!")
+                    # Atualiza o session state para aplicação imediata
+                    st.session_state["GITHUB_PAT"] = github_pat.strip()
+                    st.session_state["GITHUB_REPO"] = github_repo.strip()
+                    st.session_state["GITHUB_BRANCH"] = github_branch.strip()
+                    st.rerun()
+                else:
+                    st.error("Erro ao salvar as credenciais no secrets.toml.")
+
     # Inicializa estado para notações customizadas
     if "custom_notations" not in st.session_state:
         st.session_state.custom_notations = []
@@ -545,14 +600,17 @@ def run_page():
                     from git_integration import commitar_arquivo_github
                     
                     status_box.write("🚀 Enviando aula gerada ao repositório GitHub...")
-                    caminho_repositorio_py = os.path.relpath(caminho_script_gerado).replace("\\", "/")
+                    
+                    nome_arquivo_py = os.path.basename(caminho_script_gerado)
+                    caminho_repositorio_py = f"aulas/{nome_arquivo_py}"
                     sucesso_py = commitar_arquivo_github(
                         caminho_local=caminho_script_gerado,
                         caminho_repositorio=caminho_repositorio_py,
                         mensagem_commit=f"feat: adiciona aula {caminho_repositorio_py}"
                     )
                     
-                    caminho_repositorio_log = os.path.relpath(caminho_log_especifico).replace("\\", "/")
+                    nome_arquivo_log = os.path.basename(caminho_log_especifico)
+                    caminho_repositorio_log = f"aulas/{nome_arquivo_log}"
                     sucesso_log = commitar_arquivo_github(
                         caminho_local=caminho_log_especifico,
                         caminho_repositorio=caminho_repositorio_log,
@@ -737,7 +795,6 @@ def run_page():
                                 st.write(f"**Rejeições do Revisor:** {reprovacoes_sub}")
                             with col_sub3:
                                 st.write(f"**Falhas de API enfrentadas:** {sub_total_erros}")
-                                st.write(f"└ *429 (Cota): {sub_erros_429} | 503 (Indisp.): {sub_erros_503} | Outros: {sub_erros_outros}*")
                                 
                             feedbacks_list = sub.get("feedbacks", [])
                             if feedbacks_list:

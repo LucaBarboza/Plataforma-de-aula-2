@@ -1,15 +1,80 @@
 import os
 import base64
 import requests
+import re
+
+def extrair_repo_git_local():
+    """Tenta ler a URL do remote origin no arquivo .git/config e extrair o path 'dono/repo'."""
+    try:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        caminho_config = os.path.join(base_dir, ".git", "config")
+        
+        if not os.path.exists(caminho_config):
+            caminho_config = os.path.join(os.getcwd(), ".git", "config")
+            
+        if os.path.exists(caminho_config):
+            with open(caminho_config, "r", encoding="utf-8") as f:
+                conteudo = f.read()
+            # Regex para casar com URLs HTTPS ou SSH do GitHub
+            match = re.search(r'url\s*=\s*(?:https://github\.com/|git@github\.com:)([^/\s]+/[^/\s\.]+?)(?:\.git)?\s*$', conteudo, re.MULTILINE | re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+    except Exception as e:
+        print(f"[GITHUB] Erro ao tentar extrair repositório local do .git/config: {e}")
+    return None
+
+def salvar_credencial_github(token: str, repo: str, branch: str = "main"):
+    """Salva as credenciais do GitHub no arquivo .streamlit/secrets.toml local do projeto."""
+    try:
+        diretorio_streamlit = os.path.join(os.getcwd(), ".streamlit")
+        os.makedirs(diretorio_streamlit, exist_ok=True)
+        caminho_secrets = os.path.join(diretorio_streamlit, "secrets.toml")
+        
+        secrets_atuais = {}
+        if os.path.exists(caminho_secrets):
+            with open(caminho_secrets, "r", encoding="utf-8") as f:
+                for linha in f:
+                    linha_limpa = linha.strip()
+                    if linha_limpa and "=" in linha_limpa and not linha_limpa.startswith("#"):
+                        parts = linha_limpa.split("=", 1)
+                        k = parts[0].strip()
+                        v = parts[1].strip().strip('"').strip("'")
+                        secrets_atuais[k] = v
+        
+        # Atualiza segredos
+        if token:
+            secrets_atuais["GITHUB_PAT"] = token
+        if repo:
+            secrets_atuais["GITHUB_REPO"] = repo
+        if branch:
+            secrets_atuais["GITHUB_BRANCH"] = branch
+            
+        # Grava de volta
+        with open(caminho_secrets, "w", encoding="utf-8") as f:
+            for k, v in secrets_atuais.items():
+                f.write(f'{k} = "{v}"\n')
+        return True
+    except Exception as e:
+        print(f"[GITHUB] Erro ao salvar credenciais em secrets.toml: {e}")
+        return False
 
 def obter_credencial_github():
-    """Recupera as credenciais do GitHub a partir do ambiente ou do st.secrets."""
+    """Recupera as credenciais do GitHub a partir do ambiente, do st.secrets ou do st.session_state."""
     token = os.environ.get("GITHUB_PAT") or os.environ.get("GITHUB_TOKEN")
     repo = os.environ.get("GITHUB_REPO")
     branch = os.environ.get("GITHUB_BRANCH", "main")
     
     try:
         import streamlit as st
+        # 1. Tenta carregar do st.session_state
+        if not token and "GITHUB_PAT" in st.session_state:
+            token = st.session_state["GITHUB_PAT"]
+        if not repo and "GITHUB_REPO" in st.session_state:
+            repo = st.session_state["GITHUB_REPO"]
+        if branch == "main" and "GITHUB_BRANCH" in st.session_state:
+            branch = st.session_state["GITHUB_BRANCH"]
+            
+        # 2. Tenta carregar do st.secrets
         if not token and "GITHUB_PAT" in st.secrets:
             token = st.secrets["GITHUB_PAT"]
         if not token and "GITHUB_TOKEN" in st.secrets:
@@ -20,6 +85,10 @@ def obter_credencial_github():
             branch = st.secrets["GITHUB_BRANCH"]
     except Exception:
         pass
+        
+    # 3. Se repositório ainda não foi definido, tenta autodetectar a partir do .git/config local
+    if not repo:
+        repo = extrair_repo_git_local()
         
     return token, repo, branch
 
