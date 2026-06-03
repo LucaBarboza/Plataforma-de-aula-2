@@ -1,0 +1,126 @@
+{
+    "status": "sucesso",
+    "timestamp_inicio": "2026-06-03 00:26:18",
+    "tema": "R",
+    "professor": "R",
+    "disciplina": "R",
+    "tempo_total_segundos": 502.25,
+    "etapas": {
+        "1_indexacao_rag": {
+            "descricao": "Indexação dos Materiais de Apoio (RAG Pessoal)",
+            "status": "pulado",
+            "duracao_segundos": 0.0
+        },
+        "2_roteirista": {
+            "descricao": "Agente 1: Roteirista (Alinhamento de Escopo e Trilha)",
+            "status": "sucesso",
+            "duracao_segundos": 8.51
+        },
+        "3_escrita_revisao": {
+            "descricao": "Agente 2 + 2.5: Escritor & Revisor (Loop de Revisão Ativa)",
+            "status": "sucesso",
+            "duracao_segundos": 211.68,
+            "subtopicos": [
+                {
+                    "titulo": "A Análise de Bivariada: Diagrama de Dispersão e Covariância",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 30.94,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Mensuração da Associação: O Coeficiente de Correlação de Pearson",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 39.53,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Estrutura do Modelo de Regressão Linear Simples",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 34.81,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Otimização Paramétrica: O Método dos Mínimos Quadrados",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 34.51,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Diagnóstico de Ajuste: Análise e Interpretação de Resíduos",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 39.2,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Extensão da Modelagem: Ajustamento de Funções de Potência e Exponenciais",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 32.68,
+                    "aprovado": true
+                }
+            ]
+        },
+        "4_lapidacao_editorial": {
+            "descricao": "Agente 3.5: Editor-Chefe (Unificação e Coerência Global)",
+            "status": "sucesso",
+            "duracao_segundos": 19.78
+        },
+        "5_expansao_prosa": {
+            "descricao": "Agente 3.75: Construtor de Prosa (Expansão Exaustiva de Livro)",
+            "status": "sucesso",
+            "duracao_segundos": 86.27
+        },
+        "6_caderno_exercicios": {
+            "descricao": "Agente 3: Caderno de Exercícios (Questões Fechadas e Abertas)",
+            "status": "sucesso",
+            "duracao_segundos": 17.34
+        },
+        "7_compilacao_interface": {
+            "descricao": "Fase 6: Compilação de Interface Streamlit",
+            "status": "sucesso",
+            "duracao_segundos": 156.89
+        }
+    },
+    "timestamp_fim": "2026-06-03 00:34:40"
+}
