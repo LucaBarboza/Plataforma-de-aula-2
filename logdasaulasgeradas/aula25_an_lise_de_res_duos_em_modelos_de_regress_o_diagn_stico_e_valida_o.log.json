@@ -1,0 +1,116 @@
+{
+    "status": "sucesso",
+    "timestamp_inicio": "2026-06-02 23:59:56",
+    "tema": "7.1 – Análise de resíduos",
+    "professor": "Luca Barboza",
+    "disciplina": "MATD41",
+    "tempo_total_segundos": 529.83,
+    "etapas": {
+        "1_indexacao_rag": {
+            "descricao": "Indexação dos Materiais de Apoio (RAG Pessoal)",
+            "status": "pulado",
+            "duracao_segundos": 0.0
+        },
+        "2_roteirista": {
+            "descricao": "Agente 1: Roteirista (Alinhamento de Escopo e Trilha)",
+            "status": "sucesso",
+            "duracao_segundos": 8.15
+        },
+        "3_escrita_revisao": {
+            "descricao": "Agente 2 + 2.5: Escritor & Revisor (Loop de Revisão Ativa)",
+            "status": "sucesso",
+            "duracao_segundos": 311.9,
+            "subtopicos": [
+                {
+                    "titulo": "O Vetor de Resíduos e o Operador de Projeção",
+                    "tentativas": 2,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 1
+                    },
+                    "tempo_segundos": 66.87,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Propriedades Estatísticas e Distribucionais dos Resíduos",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 37.11,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Padronização e Studentização de Resíduos",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 37.83,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Diagnóstico de Heterocedasticidade e Linearidade",
+                    "tentativas": 2,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 1
+                    },
+                    "tempo_segundos": 59.64,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Avaliação da Normalidade e Suposições Distribucionais",
+                    "tentativas": 3,
+                    "reprovacoes": 2,
+                    "feedbacks": [
+                        "O conteúdo, embora tecnicamente preciso e bem estruturado, apresenta violações das diretrizes de notação estrita obrigatórias. Foi identificado o uso de símbolos fora da formatação LaTeX exigida: 1. O termo 'p-valor' deve ser escrito obrigatoriamente como '$p\\text{-valor}$'. 2. As referências aos testes estatísticos 't' e 'F' devem estar formatadas como '$t$' e '$F$' para garantir a padronização científica. O Escritor deve realizar uma revisão global do texto, substituindo todas as ocorrências de símbolos estatísticos por suas respectivas notações em LaTeX conforme a tabela de diretrizes de estilo.",
+                        "O conteúdo apresenta desvios notacionais obrigatórios em relação à Tabela de Notações Estritas (Diretrizes 1.1 e 1.4). Correções necessárias: 1) Resíduo Amostral: O guia de estilo determina que a notação deve ser $e_i$, porém o texto utiliza $\\hat{\\epsilon}$ de forma persistente. 2) Variância e Desvio Padrão Amostral: O guia exige o uso de $S^2$ e $S$ (maiúsculos), mas o conteúdo utiliza $s^2$ e $s$. Refaça a notação em todo o documento, incluindo a fundamentação teórica, a dedução e o exemplo canônico."
+                    ],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 110.44,
+                    "aprovado": true
+                }
+            ]
+        },
+        "4_lapidacao_editorial": {
+            "descricao": "Agente 3.5: Editor-Chefe (Unificação e Coerência Global)",
+            "status": "sucesso",
+            "duracao_segundos": 27.2
+        },
+        "5_expansao_prosa": {
+            "descricao": "Agente 3.75: Construtor de Prosa (Expansão Exaustiva de Livro)",
+            "status": "sucesso",
+            "duracao_segundos": 74.96
+        },
+        "6_caderno_exercicios": {
+            "descricao": "Agente 3: Caderno de Exercícios (Questões Fechadas e Abertas)",
+            "status": "sucesso",
+            "duracao_segundos": 15.93
+        },
+        "7_compilacao_interface": {
+            "descricao": "Fase 6: Compilação de Interface Streamlit",
+            "status": "sucesso",
+            "duracao_segundos": 89.75
+        }
+    },
+    "timestamp_fim": "2026-06-03 00:08:46"
+}
