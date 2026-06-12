@@ -117,59 +117,7 @@ Para assegurar legibilidade em qualquer dispositivo, a tipografia é fixa e não
 
 ---
 
-### 🐍 Cenário A: Se o motor gráfico ativo for SEABORN / MATPLOTLIB
-
-O código de plotagem em Python deve ser estruturado de forma milimétrica. A IA deve gerar os gráficos incorporando o seguinte template de estilização padrão:
-
-```python
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# 1. Configurar tema global antes de instanciar a figura
-sns.set_theme(style="whitegrid", rc={
-    "grid.linestyle": "--",
-    "grid.alpha": 0.5,
-    "grid.color": "#E2E8F0",
-    "font.family": "sans-serif",
-    "font.sans-serif": ["Arial", "DejaVu Sans", "Helvetica"]
-})
-
-# 2. Instanciar figura com DPI alto e tamanho fixado para consistência
-fig, ax = plt.subplots(figsize=(10, 5), dpi=300)
-fig.patch.set_facecolor('#FFFFFF')
-ax.set_facecolor('#FFFFFF')
-
-# [Espaço Reservado para a Geração do Gráfico - Linhas, Barras, Distribuições]
-# Exemplo de preenchimento de curva com transparência (Shading)
-# ax.fill_between(x, y, color="#1E3A8A", alpha=0.15)
-# ax.plot(x, y, color="#1E3A8A", linewidth=2.5)
-
-# 3. Limpeza de Bordas Acadêmica (Despine)
-# Mantém apenas as linhas guia sutis inferiores e esquerdas se necessário
-sns.despine(left=True, bottom=False, right=True, top=True)
-
-# 4. Rótulos Estritos com LaTeX e Variáveis Notacionais Corretas
-ax.set_title("Título Estruturado do Gráfico", fontsize=14, fontweight="bold", pad=15, color="#1E293B")
-ax.set_xlabel(r"Eixo X ($\bar{X}$)", fontsize=11, labelpad=8, color="#1E293B")
-ax.set_ylabel(r"Densidade de Probabilidade ($f(x)$)", fontsize=11, labelpad=8, color="#1E293B")
-
-# 5. Estilização de Ticks
-ax.tick_params(axis='both', which='major', labelsize=9, labelcolor="#64748B")
-
-# 6. Estilização de Legenda (Se houver)
-if ax.get_legend_handles_labels()[0]:
-    legend = ax.legend(frameon=True, facecolor="#F8FAFC", edgecolor="#E2E8F0", fontsize=9)
-    for text in legend.get_texts():
-        text.set_color("#64748B")
-
-# 7. Renderização Segura no Streamlit
-st.pyplot(fig)
-plt.close(fig) # Liberar memória explicitamente
-```
-
----
-
-### 📊 Cenário B: Se o motor gráfico ativo for PLOTLY
+### 📊 Diretrizes de Plotly (Motor Gráfico Padrão)
 
 O programador deve forçar uma folha de estilo web premium, fluida e totalmente otimizada para mobile. O layout Plotly deve ser atualizado estritamente como demonstrado abaixo:
 

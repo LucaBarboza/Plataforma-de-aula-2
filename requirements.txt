@@ -3,6 +3,5 @@ numpy
 pandas
 scipy
 plotly
-seaborn
 google-genai
 pydantic

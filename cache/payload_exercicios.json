@@ -1,105 +1,355 @@
 {
-    "topico_aula": "5.1 – O procedimento geral da análise de variância (ANOVA)",
+    "topico_aula": "Unidade 1 - Tópico 1.1: Amostras aleatórias simples e amostras sistemáticas",
     "questoes_multipla_escolha": [
         {
-            "enunciado": "Em um estudo clínico para avaliar a eficácia de quatro novos fármacos neurotrópicos na redução da latência de disparo neural, um pesquisador decide comparar as médias dos tempos de resposta entre os quatro grupos utilizando múltiplos testes t de Student para cada par de grupos (ex: Drug 1 vs. Drug 2, Drug 1 vs. Drug 3, etc.). Considerando o rigor estatístico, qual é a principal falha procedimental deste pesquisador ao não utilizar a ANOVA?",
+            "enunciado": "Uma fábrica de componentes aeronáuticos produz anualmente 10.000 turbinas de alta precisão. O departamento de engenharia de qualidade deseja estimar a média da resistência à tração ($\\mu$) dessas turbinas para garantir conformidade com normas de segurança. Devido ao alto custo destrutivo do teste, é impossível testar todas as 10.000 turbinas. O engenheiro responsável decide selecionar, via sorteio aleatório, 50 turbinas e medir sua resistência, calculando a média aritmética dessas observações ($\\bar{X}$). Assinale a alternativa que identifica corretamente os conceitos estatísticos aplicados.",
             "alternativas": {
-                "A": "O teste t de Student não possui poder estatístico suficiente para comparar médias de diferentes grupos experimentais, independentemente da quantidade de grupos.",
-                "B": "A utilização de múltiplos testes t de Student inflaciona severamente o Erro Tipo I (probabilidade de detectar uma diferença falsa onde não existe), devido ao problema da taxa de erro familiar (family-wise error rate).",
-                "C": "O modelo ANOVA exige necessariamente que os dados sigam uma distribuição de Poisson, enquanto o teste t exige normalidade, tornando a comparação matematicamente incompatível.",
-                "D": "O teste t de Student é restrito a amostras com tamanho $n < 30$, sendo a ANOVA a única técnica capaz de lidar com amostras grandes.",
-                "E": "A ANOVA é, na verdade, uma simplificação do teste t de Student, e não existe diferença procedimental entre os dois métodos para mais de dois grupos."
+                "A": "A população é a amostra de 50 turbinas; o parâmetro é a média amostral ($\\bar{X}$).",
+                "B": "A população é o conjunto de 10.000 turbinas; o parâmetro é a média populacional ($\\mu$) e a estatística é a média amostral ($\\bar{X}$).",
+                "C": "A população é a média das 10.000 turbinas; a estatística é a resistência da turbina individual.",
+                "D": "O parâmetro é a média amostral ($\\bar{X}$) e a estatística é o tamanho amostral ($n=50$).",
+                "E": "O tamanho amostral ($n$) é igual ao tamanho populacional ($N$) neste cenário de teste destrutivo."
             },
             "alternativa_correta": "B",
-            "dica": "Reflita sobre o que acontece com a probabilidade acumulada de rejeitar a hipótese nula quando você realiza vários testes sucessivos de comparação de médias ao nível $\\alpha$.",
-            "gabarito_comentado": "A utilização de múltiplos testes t de Student para comparar $k$ grupos resulta na inflação do Erro Tipo I. Se cada teste é realizado com um nível de significância $\\alpha = 0,05$, a probabilidade de cometer pelo menos um Erro Tipo I ao realizar múltiplos testes cresce exponencialmente. A ANOVA corrige isso ao avaliar todas as médias simultaneamente sob a hipótese $H_0: \\alpha_1 = \\alpha_2 = \\dots = \\alpha_k = 0$, mantendo a taxa de erro global sob controle."
+            "dica": "Lembre-se da distinção entre medidas teóricas fixas da população inteira e as variáveis calculadas a partir da amostra coletada.",
+            "gabarito_comentado": "A população é o conjunto completo de 10.000 turbinas. O parâmetro $\\mu$ é a média populacional (desconhecida). A amostra consiste nas 50 turbinas selecionadas aleatoriamente. A estatística $\\bar{X}$ (média amostral) é utilizada para estimar o parâmetro desconhecido $\\mu$.",
+            "codigo_plotly": "fig = go.Figure() fig.add_trace(go.Scatter(x=[1, 2, 3, 4, 5], y=[10, 15, 12, 18, 14], mode='markers', name='Amostra', marker=dict(color='#1E3A8A', size=10))) fig.update_layout(title='Representação de Dados Amostrais', xaxis=dict(title='Índice da Amostra', fixedrange=True), yaxis=dict(title='Resistência', fixedrange=True), template='plotly_white')",
+            "referencia_livro": "Bussab & Morettin, Estatística Básica, Cap 5, p. 115"
         },
         {
-            "enunciado": "Considere que, na decomposição da variabilidade total de um experimento sobre o efeito de diferentes dietas na plasticidade sináptica, observou-se que a $SQTrat$ é muito próxima de zero e a $SQRes$ é elevada. Qual conclusão estatística é mais provável para a estatística $F_{\\text{calc}}$ e a decisão sobre a hipótese nula?",
+            "enunciado": "Em um estudo sobre o tempo de conexão de dispositivos IoT em uma rede inteligente, considera-se a Amostra Aleatória Simples (AAS) como fundamental. Se um pesquisador coleta dados apenas de dispositivos próximos ao roteador central, ignorando dispositivos em áreas periféricas, qual é a principal falha inferencial cometida?",
             "alternativas": {
-                "A": "A estatística $F_{\\text{calc}}$ será muito alta, levando à rejeição de $H_0$ e indicando que os efeitos dos tratamentos são altamente significativos.",
-                "B": "A estatística $F_{\\text{calc}}$ será aproximadamente 1, indicando que o tratamento explica a maior parte da variabilidade dos dados.",
-                "C": "A estatística $F_{\\text{calc}}$ será muito baixa (próxima de zero), indicando que a variabilidade entre grupos é desprezível comparada ao ruído residual, sugerindo a não rejeição de $H_0$.",
-                "D": "O valor de $F_{\\text{calc}}$ será negativo, o que é matematicamente impossível, indicando erro na coleta dos dados experimentais.",
-                "E": "A estatística $F_{\\text{calc}}$ será igual à $SQTot$, o que invalida o teste de hipótese realizado."
-            },
-            "alternativa_correta": "C",
-            "dica": "Lembre-se que $F_{\\text{calc}} = \\frac{QMTrat}{QMRes}$. Se o numerador é quase zero e o denominador é grande, qual o comportamento da razão?",
-            "gabarito_comentado": "A estatística $F_{\\text{calc}}$ é a razão entre o Quadrado Médio do Tratamento ($QMTrat$) e o Quadrado Médio do Erro ($QMRes$). Se a $SQTrat$ é próxima de zero, significa que as médias dos grupos são muito semelhantes entre si e próximas da média global ($\\bar{Y}_{..}$). Com um $QMRes$ elevado (muito ruído), a razão $QMTrat / QMRes$ tende a zero. Valores de $F_{\\text{calc}}$ próximos de zero indicam que não há evidência suficiente para rejeitar a hipótese nula de que as médias são iguais."
-        },
-        {
-            "enunciado": "Em uma análise de variância de um experimento com $k=3$ grupos e $n=10$ observações por grupo, o número total de observações é $N=30$. Quais são os graus de liberdade associados ao numerador ($gl_{\\text{num}}$) e ao denominador ($gl_{\\text{den}}$) para a estatística $F_{\\text{calc}}$?",
-            "alternativas": {
-                "A": "$gl_{\\text{num}} = 3$ e $gl_{\\text{den}} = 30$.",
-                "B": "$gl_{\\text{num}} = 2$ e $gl_{\\text{den}} = 27$.",
-                "C": "$gl_{\\text{num}} = 29$ e $gl_{\\text{den}} = 3$.",
-                "D": "$gl_{\\text{num}} = 30$ e $gl_{\\text{den}} = 2$.",
-                "E": "$gl_{\\text{num}} = 10$ e $gl_{\\text{den}} = 20$."
+                "A": "A amostra torna-se muito grande, tornando o cálculo da estatística $\\bar{X}$ desnecessariamente complexo.",
+                "B": "A AAS é violada, pois nem todos os dispositivos possuem a mesma probabilidade de serem selecionados, comprometendo a representatividade da amostra em relação à população.",
+                "C": "O parâmetro $\\mu$ torna-se uma variável aleatória dependente do tamanho populacional $N$.",
+                "D": "O tamanho amostral $n$ deve ser obrigatoriamente igual a $N$ para que a inferência sobre $\\mu$ seja válida.",
+                "E": "A variância populacional $\\sigma^2$ deixa de existir quando a amostra é tendenciosa."
             },
             "alternativa_correta": "B",
-            "dica": "Verifique a definição de graus de liberdade na teoria: $gl_{\\text{num}} = k - 1$ e $gl_{\\text{den}} = N - k$.",
-            "gabarito_comentado": "Aplicando as fórmulas fornecidas na teoria: $gl_{\\text{num}} = k - 1$. Como temos $k=3$ grupos, $gl_{\\text{num}} = 3 - 1 = 2$. Para o denominador, usamos $gl_{\\text{den}} = N - k$. Com $N=30$ e $k=3$, temos $gl_{\\text{den}} = 30 - 3 = 27$. Portanto, a distribuição $F$ utilizada para o teste terá parâmetros $(2, 27)$."
+            "dica": "A essência da inferência estatística depende de como a amostra é extraída. A AAS garante que o subconjunto seja um reflexo imparcial do todo.",
+            "gabarito_comentado": "A Amostra Aleatória Simples exige que cada subconjunto de tamanho $n$ da população tenha a mesma probabilidade de ser selecionado. Ao amostrar apenas dispositivos próximos ao roteador, o pesquisador introduz um viés de seleção, violando a aleatoriedade e invalidando a amostra como representação imparcial da população total.",
+            "codigo_plotly": null,
+            "referencia_livro": null
         },
         {
-            "enunciado": "Qual das seguintes suposições é fundamental para a validade do procedimento de ANOVA descrito no modelo $Y_{ij} = \\mu + \\alpha_i + \\epsilon_{ij}$?",
+            "enunciado": "Em um estudo de engenharia de confiabilidade, um pesquisador analisa o tempo de falha $X$ de um novo componente eletrônico, cuja distribuição de probabilidade é modelada por uma função densidade de probabilidade $f(x)$. Para obter dados estatísticos, ele seleciona uma Amostra Aleatória Simples (AAS) de $n=10$ componentes. Considerando a formalização da AAS, qual das alternativas abaixo descreve corretamente a função de distribuição conjunta do vetor amostral $(X_1, X_2, \\dots, X_{10})$?",
             "alternativas": {
-                "A": "Os erros aleatórios $\\epsilon_{ij}$ devem seguir uma distribuição não-paramétrica qualquer.",
-                "B": "A variância do erro $\\sigma^2$ deve variar proporcionalmente entre os grupos, conforme aumenta a média do grupo.",
-                "C": "Os erros aleatórios $\\epsilon_{ij}$ devem ser independentes, identicamente distribuídos e seguir uma distribuição normal $N(0, \\sigma^2)$.",
-                "D": "O efeito do tratamento $\\alpha_i$ deve ser sempre positivo para garantir a estabilidade da variância.",
-                "E": "A média global $\\mu$ deve ser igual a zero para que o teste $F$ seja válido."
+                "A": "A função conjunta é dada pela soma das densidades marginais: $f(x_1, \\dots, x_{10}) = \\sum_{i=1}^{10} f(x_i)$.",
+                "B": "A função conjunta é dada pelo produto das densidades marginais: $f(x_1, \\dots, x_{10}) = \\prod_{i=1}^{10} f(x_i)$, devido à independência e à propriedade de serem identicamente distribuídas.",
+                "C": "A função conjunta depende da correlação entre as variáveis, sendo impossível determinar sem conhecer a covariância entre $X_i$ e $X_j$.",
+                "D": "A função conjunta é idêntica à função de distribuição de uma única variável aleatória $X$, pois as observações são identicamente distribuídas.",
+                "E": "A função conjunta é dada pela média aritmética das densidades, garantindo que o viés de seleção seja nulo."
             },
-            "alternativa_correta": "C",
-            "dica": "Releia a seção sobre o formalismo do termo de erro $\\epsilon_{ij}$ no modelo linear.",
-            "gabarito_comentado": "O modelo linear de efeitos fixos assume que os erros $\\epsilon_{ij}$ são independentes, têm média zero, variância constante $\\sigma^2$ (homocedasticidade) e seguem uma distribuição normal. Essas premissas garantem que a estatística $F_{\\text{calc}}$ siga exatamente a distribuição $F$ de Snedecor sob a hipótese nula."
+            "alternativa_correta": "B",
+            "dica": "Lembre-se da definição de i.i.d. (independentes e identicamente distribuídas) e como a independência afeta a probabilidade conjunta de eventos.",
+            "gabarito_comentado": "A definição fundamental de uma AAS de tamanho $n$ é que as variáveis $X_1, X_2, \\dots, X_n$ são independentes e identicamente distribuídas. A propriedade da independência implica que a função de densidade (ou probabilidade) conjunta é o produto das funções marginais de cada variável individual, ou seja, $f(x_1, x_2, \\dots, x_n) = \\prod_{i=1}^{n} f(x_i)$.",
+            "codigo_plotly": "fig = go.Figure()\nfig.add_trace(go.Scatter(x=[0, 1, 2, 3, 4], y=[0.1, 0.2, 0.4, 0.2, 0.1], mode='lines+markers', name='f(x)', line=dict(color='#1E3A8A', width=3)))\nfig.update_layout(title='Representação da Densidade Marginal $f(x)$', xaxis_title='Valores de X', yaxis_title='Densidade', template='plotly_white')",
+            "referencia_livro": null
         },
         {
-            "enunciado": "No contexto da ANOVA, o que representa a Soma de Quadrados dos Tratamentos ($SQTrat$)?",
+            "enunciado": "Um analista de dados utiliza uma técnica de amostragem para inspecionar a qualidade de lotes de produção. O procedimento consiste em retirar uma unidade, registrar sua característica, recolocá-la no lote e repetir o processo. Este procedimento é clássico para a obtenção de uma Amostra Aleatória Simples (AAS). Por que a prática de 'recolocar a unidade no lote' é teórica e matematicamente crucial para a formalização da AAS?",
             "alternativas": {
-                "A": "A variabilidade total observada entre todas as unidades experimentais independentemente do grupo.",
-                "B": "A variação inerente de cada observação em relação à média do seu próprio grupo, representando o ruído experimental.",
-                "C": "A dispersão das médias dos grupos em relação à média global, capturando o efeito sistemático dos tratamentos.",
-                "D": "O valor quadrático da média aritmética de todas as observações do experimento.",
-                "E": "A diferença entre o maior valor observado e o menor valor observado em todo o conjunto de dados."
+                "A": "Porque reduz o custo operacional da amostragem em comparação com o método sem reposição.",
+                "B": "Porque permite que o tamanho da amostra $n$ seja maior que o tamanho da população $N$.",
+                "C": "Porque garante a independência das observações, assegurando que a probabilidade de seleção de uma unidade não seja alterada pelas seleções anteriores, permitindo tratar as variáveis como i.i.d.",
+                "D": "Porque elimina a necessidade de definir uma função de distribuição de probabilidade para a população, simplificando os cálculos.",
+                "E": "Porque a reposição é obrigatória apenas quando a população é finita e muito pequena, caso contrário não influencia os resultados."
             },
             "alternativa_correta": "C",
-            "dica": "Pense em termos de 'sinal vs ruído'. O que a ANOVA tenta isolar quando compara grupos?",
-            "gabarito_comentado": "A $SQTrat$ (ou soma de quadrados entre grupos) quantifica o quanto as médias dos grupos ($\\bar{Y}_{i.}$) desviam-se da média global ($\\bar{Y}_{..}$). É a componente que reflete o 'sinal' ou o efeito dos níveis do fator. Se esta componente for grande, as médias dos grupos são distantes entre si, o que é evidência contra a hipótese de igualdade de médias."
+            "dica": "Reflita sobre o conceito de 'independência' no formalismo da AAS. O que acontece com a composição da população se retirarmos uma unidade e não a devolvermos?",
+            "gabarito_comentado": "A AAS exige que as variáveis sejam independentes e identicamente distribuídas. Se retirarmos uma amostra sem reposição de uma população finita, a seleção da segunda unidade depende da primeira (a composição da população muda). A reposição garante que, em cada sorteio, a população permaneça a mesma, mantendo a independência entre as observações $X_i$, o que é um pilar da formalização matemática da AAS.",
+            "codigo_plotly": null,
+            "referencia_livro": null
+        },
+        {
+            "enunciado": "Em um projeto de monitoramento de IoT na UFBA, uma rede de $N=400$ sensores de temperatura está instalada no campus. O pesquisador decide coletar uma Amostra Aleatória Simples (AAS) de $n=16$ sensores para uma inspeção de calibração. Considerando o mecanismo de seleção de uma AAS, qual é a probabilidade de inclusão ($\\pi_i$) de qualquer sensor específico nesta amostra?",
+            "alternativas": {
+                "A": "0.02",
+                "B": "0.04",
+                "C": "0.05",
+                "D": "0.08",
+                "E": "0.10"
+            },
+            "alternativa_correta": "B",
+            "dica": "Lembre-se que na Amostra Aleatória Simples, a probabilidade de inclusão é constante e definida pela razão entre o tamanho da amostra e o tamanho da população.",
+            "gabarito_comentado": "A probabilidade de inclusão ($\\pi_i$) para cada unidade da população em uma AAS é dada por $\\pi_i = n / N$. Substituindo os valores: $\\pi_i = 16 / 400 = 4 / 100 = 0.04$. Portanto, cada sensor tem 4% de chance de ser selecionado.",
+            "codigo_plotly": "fig = go.Figure(); fig.add_trace(go.Bar(x=['Probabilidade de Inclusão'], y=[0.04], marker_color='#1E3A8A')); fig.update_layout(title='Probabilidade de Inclusão na AAS', template='plotly_white', yaxis=dict(range=[0, 0.06]));",
+            "referencia_livro": null
+        },
+        {
+            "enunciado": "Em um ensaio clínico sobre a eficácia de um novo fármaco, o pesquisador deve selecionar pacientes de uma base de dados. Ao comparar os mecanismos de seleção, o pesquisador opta pela amostragem *sem reposição*. Qual é a principal consequência estatística desta escolha em relação à amostragem *com reposição*?",
+            "alternativas": {
+                "A": "A probabilidade de inclusão torna-se variável para cada unidade, invalidando a AAS.",
+                "B": "As observações tornam-se independentes, facilitando o cálculo da variância.",
+                "C": "A amostra torna-se mais eficiente por evitar a redundância, embora introduza uma dependência entre as extrações.",
+                "D": "O número total de possíveis amostras diminui drasticamente, tornando o cálculo de $\\binom{N}{n}$ desnecessário.",
+                "E": "A média amostral $\\bar{X}$ deixa de ser um estimador não-viciado da média populacional $\\mu$."
+            },
+            "alternativa_correta": "C",
+            "dica": "Reflita sobre o custo computacional e estatístico de selecionar o mesmo elemento repetidamente. A amostragem sem reposição garante que cada elemento da amostra seja distinto.",
+            "gabarito_comentado": "A amostragem sem reposição é preferida na prática pois cada elemento extraído é único, o que reduz a variabilidade das estimativas. Embora cada extração sucessiva dependa das anteriores, este mecanismo é fundamental na AAS para garantir a máxima eficiência da informação coletada da população finita.",
+            "codigo_plotly": null,
+            "referencia_livro": "Bussab & Morettin, Estatística Básica, Cap 5"
+        },
+        {
+            "enunciado": "Em uma auditoria de uma linha de montagem automatizada com $N = 2000$ unidades produzidas, deseja-se selecionar uma amostra sistemática de tamanho $n = 40$ para verificação de conformidade dimensional. Considerando que o procedimento exige a determinação do intervalo de amostragem $k$, e que a unidade sorteada inicialmente foi $a = 15$, qual é o conjunto de observações correspondente às três primeiras unidades selecionadas para a amostra?",
+            "alternativas": {
+                "A": "15, 65, 115",
+                "B": "15, 20, 25",
+                "C": "40, 80, 120",
+                "D": "15, 50, 85",
+                "E": "20, 40, 60"
+            },
+            "alternativa_correta": "A",
+            "dica": "Lembre-se que o intervalo $k$ é definido pela parte inteira de $N/n$ e os elementos da amostra seguem a progressão $a, a+k, a+2k, \\dots$.",
+            "gabarito_comentado": "O intervalo de amostragem é $k = \\lfloor N/n \\rfloor = \\lfloor 2000/40 \\rfloor = 50$. Com o ponto de partida $a = 15$, a sequência de seleção é: 1ª unidade = $15$, 2ª unidade = $15 + 50 = 65$, 3ª unidade = $15 + 2(50) = 115$. Portanto, a alternativa A está correta.",
+            "codigo_plotly": "fig = go.Figure(); fig.add_trace(go.Scatter(x=[1, 2, 3], y=[15, 65, 115], mode='markers+lines', name='Amostragem', line=dict(color='#1E3A8A', width=3))); fig.update_layout(title='<b>Seleção Sistemática (n=3)</b>', xaxis=dict(title='Posição na Amostra', fixedrange=True), yaxis=dict(title='Elemento (ID)', fixedrange=True), template='plotly_white')",
+            "referencia_livro": null
+        },
+        {
+            "enunciado": "Uma empresa de logística armazena registros de transações diárias de forma cronológica em uma base de dados. Um analista decide aplicar a amostragem sistemática com um intervalo $k = 7$ para selecionar transações de uma semana. Qual é o principal risco estatístico ao utilizar esse procedimento sem verificar a ordenação da população?",
+            "alternativas": {
+                "A": "O intervalo $k$ ser muito pequeno, invalidando o custo operacional.",
+                "B": "A possibilidade de encontrar periodicidade intrínseca na população, introduzindo viés sistemático.",
+                "C": "A amostra torna-se não probabilística por ser fixa.",
+                "D": "A variância do estimador ser sempre maior do que na Amostragem Aleatória Simples.",
+                "E": "O erro de arredondamento no cálculo de $k = N/n$ ser desprezível."
+            },
+            "alternativa_correta": "B",
+            "dica": "Reflita sobre o que acontece se o intervalo escolhido coincidir com um ciclo de eventos no banco de dados, como transações que ocorrem sempre no mesmo dia da semana.",
+            "gabarito_comentado": "O viés sistemático ocorre quando o intervalo $k$ coincide com um ciclo ou periodicidade na ordenação da lista original (ex: selecionar apenas transações de segundas-feiras). Se a lista possui periodicidade, a amostra sistemática deixa de ser representativa, violando a premissa de que a ordem não deve estar correlacionada com a variável de interesse.",
+            "codigo_plotly": null,
+            "referencia_livro": null
+        },
+        {
+            "enunciado": "Em um processo de controle de qualidade automatizado em uma linha de montagem, deseja-se estimar o diâmetro médio $\\mu$ de $N = 5000$ peças produzidas em um turno. O engenheiro responsável opta pela Amostragem Sistemática, definindo um intervalo $k = N/n = 50$. No entanto, o equipamento de corte apresenta uma vibração mecânica cíclica que ocorre exatamente a cada 50 peças, introduzindo uma imperfeição sistemática. Considerando as propriedades dos estimadores, qual das alternativas descreve corretamente o impacto desta periodicidade na Amostragem Sistemática?",
+            "alternativas": {
+                "A": "A Amostragem Sistemática será mais eficiente que a AAS, pois a periodicidade reduz a variância da média amostral $\\bar{X}_{sys}$ ao capturar a variação cíclica.",
+                "B": "A Amostragem Sistemática será inviabilizada, resultando em um estimador não-viesado, porém com variância significativamente superior à da AAS devido à correlação intraclasse $\\rho_w$ positiva.",
+                "C": "A periodicidade da falha, ao coincidir com o intervalo de amostragem $k$, induzirá um viés sistemático severo, tornando a média amostral $\\bar{X}_{sys}$ um estimador viesado para $\\mu$, invalidando a estimativa da precisão baseada na variância teórica.",
+                "D": "O valor do estimador $\\bar{X}_{sys}$ convergerá para $\\mu$ independentemente da periodicidade, pois o tamanho amostral $n = 100$ é suficientemente grande para garantir a normalidade assintótica.",
+                "E": "A Amostragem Sistemática permanece idêntica à AAS em termos de viés, pois a escolha do elemento inicial $r$ aleatoriamente compensa qualquer padrão cíclico pré-existente na população."
+            },
+            "alternativa_correta": "C",
+            "dica": "Analise como a dependência entre os elementos selecionados (correlação intraclasse $\\rho_w$) é afetada quando o intervalo de seleção $k$ coincide com o período da falha.",
+            "gabarito_comentado": "Na Amostragem Sistemática, a variância é dada por $Var(\\bar{X}_{sys}) = \\frac{\\sigma^2}{n} [1 + (n-1)\\rho_w]$. Quando existe uma periodicidade na população que coincide com o passo $k$, os elementos selecionados tendem a ser muito parecidos entre si (todos pegam o mesmo ponto do ciclo da falha), o que implica uma correlação intraclasse $\\rho_w$ elevada e positiva. Isso não apenas aumenta a variância, mas, crucialmente, introduz um viés na estimativa da média, pois a amostra não representa a população de forma aleatória, mas sim uma fatia enviesada do ciclo. Portanto, a alternativa C é a correta.",
+            "codigo_plotly": "fig = go.Figure()\nfig.add_trace(go.Scatter(x=list(range(1, 101)), y=[10 + 2*math.sin(i*2*3.14159/10) for i in range(100)], mode='lines+markers', name='População Cíclica', line=dict(color='#1E3A8A', width=2)))\nfig.update_layout(template='plotly_white', title='Exemplo de Periodicidade Populacional', xaxis_title='Índice da População', yaxis_title='Variável de Interesse', showlegend=True)",
+            "referencia_livro": null
+        },
+        {
+            "enunciado": "Considere uma população de $N$ unidades organizadas aleatoriamente. Deseja-se comparar a eficiência da Amostragem Aleatória Simples (AAS) e da Amostragem Sistemática. Sabendo que na AAS a variância é $Var(\\bar{X}) = \\frac{\\sigma^2}{n} \\left( \\frac{N-n}{N-1} \\right)$ e na sistemática é $Var(\\bar{X}_{sys}) = \\frac{\\sigma^2}{n} [1 + (n-1)\\rho_w]$, em que condições a Amostragem Sistemática apresenta maior precisão (menor variância) do que a AAS?",
+            "alternativas": {
+                "A": "Quando a correlação intraclasse é nula, ou seja, $\\rho_w = 0$.",
+                "B": "Quando a correlação intraclasse é negativa, especificamente $\\rho_w < -\\frac{1}{N-1}$.",
+                "C": "Sempre, pois a estrutura de amostragem sistemática é inerentemente mais eficiente devido à distribuição uniforme dos elementos selecionados.",
+                "D": "Quando a correlação intraclasse é positiva, superando o valor de $\\frac{1}{n-1}$.",
+                "E": "Nunca, a Amostragem Sistemática é sempre menos eficiente ou igual à AAS, independentemente da ordenação dos dados."
+            },
+            "alternativa_correta": "B",
+            "dica": "Compare os termos que multiplicam $\\frac{\\sigma^2}{n}$ em ambas as fórmulas de variância e verifique qual valor de $\\rho_w$ torna a variância sistemática menor que a variância da AAS.",
+            "gabarito_comentado": "Para que a Amostragem Sistemática seja mais precisa, precisamos que $Var(\\bar{X}_{sys}) < Var(\\bar{X})$. Comparando as expressões: $[1 + (n-1)\\rho_w] < \\left( \\frac{N-n}{N-1} \\right)$. Ao isolar $\\rho_w$, encontra-se que para uma ordenação que favorece a diversidade na amostra (correlação negativa), a amostragem sistemática supera a AAS. O ponto de igualdade ocorre próximo a $\\rho_w = -1/(N-1)$. Portanto, para $\\rho_w < -1/(N-1)$, a sistemática é superior.",
+            "codigo_plotly": null,
+            "referencia_livro": "Bussab & Morettin, Estatística Básica, Cap 5"
         }
     ],
     "questoes_discursivas": [
         {
-            "enunciado": "Considere um experimento neurocientífico onde três regiões do hipocampo (Grupos A, B e C) tiveram a expressão de uma proteína medida. Os dados (em unidades arbitrárias) são: Grupo A: {10, 12, 11}; Grupo B: {15, 17, 16}; Grupo C: {11, 13, 12}. Calcule a Média Global ($\\bar{Y}_{..}$), a $SQTrat$ e a $SQRes$.",
-            "dica": "Lembre-se de calcular primeiro a média de cada grupo e depois a média de todas as observações (média global).",
+            "enunciado": "Considere uma pequena população de $N=5$ elementos, cujos valores de uma variável de interesse $X$ são: {2, 4, 6, 8, 10}. Calcule o parâmetro populacional $\\mu$ e, em seguida, tome uma amostra aleatória simples de tamanho $n=2$ composta pelos valores {4, 8}. Calcule a estatística $\\bar{X}$ correspondente.",
+            "dica": "Lembre-se que o parâmetro $\\mu$ é a média aritmética de toda a população, enquanto a estatística $\\bar{X}$ é a média aritmética apenas dos elementos amostrados.",
             "gabarito_passo_a_passo": [
-                "Passo 1: Calcular médias dos grupos. $\\bar{Y}_{A} = (10+12+11)/3 = 11$; $\\bar{Y}_{B} = (15+17+16)/3 = 16$; $\\bar{Y}_{C} = (11+13+12)/3 = 12$.",
-                "Passo 2: Calcular a Média Global $\\bar{Y}_{..} = (11+16+12)/3 = 13$.",
-                "Passo 3: Calcular $SQTrat = n \\sum (\\bar{Y}_{i.} - \\bar{Y}_{..})^2$. Aqui $n=3$. $SQTrat = 3 * [(11-13)^2 + (16-13)^2 + (12-13)^2] = 3 * [4 + 9 + 1] = 3 * 14 = 42$.",
-                "Passo 4: Calcular $SQRes = \\sum (Y_{ij} - \\bar{Y}_{i.})^2$. Grupo A: $(10-11)^2 + (12-11)^2 + (11-11)^2 = 1+1+0 = 2$. Grupo B: $(15-16)^2 + (17-16)^2 + (16-16)^2 = 1+1+0 = 2$. Grupo C: $(11-12)^2 + (13-12)^2 + (12-12)^2 = 1+1+0 = 2$.",
-                "Passo 5: $SQRes = 2 + 2 + 2 = 6$."
-            ]
+                "Passo 1: Calcular o parâmetro populacional $\\mu = \\frac{1}{N} \\sum_{i=1}^{N} X_i$.",
+                "Passo 2: $\\mu = \\frac{2+4+6+8+10}{5} = \\frac{30}{5} = 6$.",
+                "Passo 3: Calcular a estatística amostral $\\bar{X} = \\frac{1}{n} \\sum_{i=1}^{n} X_i$.",
+                "Passo 4: $\\bar{X} = \\frac{4+8}{2} = \\frac{12}{2} = 6$."
+            ],
+            "codigo_plotly": "fig = go.Figure() fig.add_trace(go.Bar(x=['População', 'Amostra'], y=[6, 6], marker_color=['#1E3A8A', '#10B981'])) fig.update_layout(title='Comparativo: Parâmetro vs. Estatística', yaxis=dict(title='Média'), template='plotly_white')",
+            "referencia_livro": null,
+            "resposta_numerica_esperada": 6.0
         },
         {
-            "enunciado": "Explique, do ponto de vista do formalismo matemático da ANOVA, por que a variância é decomposta em 'Tratamento' e 'Resíduo'. Como essa decomposição afeta a construção do teste $F$?",
-            "dica": "Considere a identidade algébrica $SQTot = SQTrat + SQRes$ e a natureza dos estimadores de variância.",
+            "enunciado": "Explique, sob a ótica da inferência estatística, por que o pesquisador utiliza uma amostra de tamanho $n$ para estimar um parâmetro $\\theta$ em vez de realizar um censo (análise de toda a população $N$), considerando restrições de custo e tempo.",
+            "dica": "Considere a definição de inferência: o movimento entre o específico observado e o geral desconhecido para compreensão de fenômenos complexos.",
             "gabarito_passo_a_passo": [
-                "Passo 1: A identidade $SQTot = SQTrat + SQRes$ deriva da partição dos desvios de cada observação: $(Y_{ij} - \\bar{Y}_{..}) = (Y_{ij} - \\bar{Y}_{i.}) + (\\bar{Y}_{i.} - \\bar{Y}_{..})$.",
-                "Passo 2: Ao elevar ao quadrado e somar, os termos cruzados se anulam (ortogonalidade), restando a soma das somas dos quadrados.",
-                "Passo 3: O termo $SQTrat$ capta a variação sistemática (efeito dos fatores). O termo $SQRes$ capta a variação aleatória (ruído).",
-                "Passo 4: Construímos $QMTrat = SQTrat / (k-1)$ e $QMRes = SQRes / (N-k)$, que são estimadores da variância populacional $\\sigma^2$ sob a hipótese nula.",
-                "Passo 5: A estatística $F = QMTrat / QMRes$ compara esses dois estimadores. Se $H_0$ é falsa, $QMTrat$ infla devido aos efeitos reais $\\alpha_i$, tornando $F$ grande e levando à rejeição de $H_0$."
-            ]
+                "A inferência estatística surge da necessidade de compreender fenômenos complexos sem a exaustão de todos os dados.",
+                "Analisar toda a população ($N$) é frequentemente proibitivo devido ao custo elevado, tempo excessivo de coleta ou natureza destrutiva do processo de medição.",
+                "A amostra de tamanho $n$ atua como uma ponte (estimador) que, se coletada sob rigor de aleatoriedade, permite inferir as propriedades do parâmetro desconhecido ($\theta$) da população ($\\mathcal{P}$) com um nível de confiança quantificável."
+            ],
+            "codigo_plotly": null,
+            "referencia_livro": null,
+            "resposta_numerica_esperada": null
         },
         {
-            "enunciado": "Você possui um output de uma ANOVA com os seguintes dados: $N=20$ observações totais, $k=4$ grupos, $SQTot = 100$ e $SQRes = 40$. Calcule o valor da estatística $F_{\\text{calc}}$ e determine os graus de liberdade.",
-            "dica": "Utilize a relação $SQTot = SQTrat + SQRes$ para encontrar $SQTrat$ antes de calcular os Quadrados Médios.",
+            "enunciado": "Seja $X_1, X_2, ..., X_n$ uma amostra aleatória simples de tamanho $n$ proveniente de uma população com média $\\mu$ e variância $\\sigma^2$. Defina formalmente a estatística $T = \\frac{1}{n} \\sum_{i=1}^{n} X_i$ e discuta se ela depende de algum parâmetro desconhecido da população.",
+            "dica": "Relembre a definição de estatística fornecida: qualquer função $T = g(X_1, ..., X_n)$ que não dependa de parâmetros desconhecidos.",
             "gabarito_passo_a_passo": [
-                "Passo 1: Identificar os componentes: $N=20$, $k=4$.",
-                "Passo 2: Calcular $SQTrat = SQTot - SQRes = 100 - 40 = 60$.",
-                "Passo 3: Calcular os Graus de Liberdade: $gl_{\\text{num}} = k - 1 = 4 - 1 = 3$. $gl_{\\text{den}} = N - k = 20 - 4 = 16$.",
-                "Passo 4: Calcular Quadrados Médios: $QMTrat = SQTrat / gl_{\\text{num}} = 60 / 3 = 20$. $QMRes = SQRes / gl_{\\text{den}} = 40 / 16 = 2.5$.",
-                "Passo 5: Calcular $F_{\\text{calc}} = QMTrat / QMRes = 20 / 2.5 = 8.0$."
-            ]
+                "A estatística $T$ definida é a média amostral $\\bar{X}$.",
+                "A fórmula $T = \\frac{1}{n} \\sum_{i=1}^{n} X_i$ utiliza apenas os valores amostrais ($X_i$) e o tamanho da amostra ($n$), que são conhecidos após a coleta.",
+                "Portanto, a estatística $T$ não depende de parâmetros desconhecidos da população (como $\\mu$ ou $\\sigma^2$), cumprindo a definição formal de estatística necessária para a inferência."
+            ],
+            "codigo_plotly": "fig = go.Figure() fig.add_trace(go.Histogram(x=[2, 4, 4, 5, 5, 5, 6, 6, 7, 8], marker_color='#1E3A8A')) fig.update_layout(title='Distribuição da Estatística (Média Amostral)', xaxis=dict(title='Valores de $\\bar{X}$'), yaxis=dict(title='Frequência'), template='plotly_white')",
+            "referencia_livro": null,
+            "resposta_numerica_esperada": null
+        },
+        {
+            "enunciado": "Seja $X$ uma variável aleatória que representa o tempo de falha de um sensor, com f.d.p. dada por $f(x) = \\lambda e^{-\\lambda x}$ para $x > 0$. Considere uma AAS de tamanho $n=3$ composta pelas variáveis $X_1, X_2, X_3$. Determine a expressão da função de densidade conjunta $f(x_1, x_2, x_3)$.",
+            "dica": "Utilize a propriedade das variáveis i.i.d. e a fórmula da função de densidade conjunta para AAS: $f(x_1, \\dots, x_n) = \\prod_{i=1}^{n} f(x_i)$.",
+            "gabarito_passo_a_passo": [
+                "Identificar que a AAS implica que $X_1, X_2, X_3$ são i.i.d. com $f(x) = \\lambda e^{-\\lambda x}$.",
+                "Aplicar a definição de função conjunta para variáveis independentes: $f(x_1, x_2, x_3) = f(x_1) \\cdot f(x_2) \\cdot f(x_3)$.",
+                "Substituir a função marginal: $f(x_1, x_2, x_3) = (\\lambda e^{-\\lambda x_1}) \\cdot (\\lambda e^{-\\lambda x_2}) \\cdot (\\lambda e^{-\\lambda x_3})$.",
+                "Simplificar a expressão utilizando propriedades de exponenciais: $f(x_1, x_2, x_3) = \\lambda^3 e^{-\\lambda(x_1+x_2+x_3)}$."
+            ],
+            "codigo_plotly": "fig = go.Figure()\nimport numpy as np\nx = np.linspace(0, 5, 100)\ny = 1.0 * np.exp(-1.0 * x)\nfig.add_trace(go.Scatter(x=x, y=y, name='f(x) = \\\\lambda e^{-\\\\lambda x}', line=dict(color='#1E3A8A', width=3)))\nfig.update_layout(title='Densidade Marginal ($Exp(\\lambda)$)', xaxis_title='x', yaxis_title='f(x)', template='plotly_white')",
+            "referencia_livro": null,
+            "resposta_numerica_esperada": null
+        },
+        {
+            "enunciado": "Suponha que uma moeda viciada resulta em 'cara' com probabilidade $p=0.6$ e 'coroa' com $1-p=0.4$. Realizamos uma AAS de tamanho $n=2$ (lançamentos independentes). Calcule a probabilidade exata da sequência (Cara, Coroa), ou seja, $P(X_1=1, X_2=0)$, onde $X_i=1$ para cara.",
+            "dica": "Use a definição de independência na AAS: $P(X_1=x_1, X_2=x_2) = P(X_1=x_1) \\cdot P(X_2=x_2)$.",
+            "gabarito_passo_a_passo": [
+                "Definir a probabilidade individual: $P(X_1=1) = 0.6$ e $P(X_2=0) = 0.4$.",
+                "Aplicar a regra da AAS (independência): $P(X_1=1, X_2=0) = P(X_1=1) \\cdot P(X_2=0)$.",
+                "Calcular o produto: $0.6 \\cdot 0.4$.",
+                "Resultado final: $0.24$."
+            ],
+            "codigo_plotly": null,
+            "referencia_livro": null,
+            "resposta_numerica_esperada": 0.24
+        },
+        {
+            "enunciado": "Explique, sob a ótica da formalização da AAS, a diferença entre selecionar uma amostra de uma população infinita versus uma população finita sem reposição. Por que, no caso de população finita sem reposição, o modelo de i.i.d. pode ser considerado uma aproximação?",
+            "dica": "Foque no conceito de independência: como a probabilidade de uma escolha futura é alterada pela escolha presente em cada cenário?",
+            "gabarito_passo_a_passo": [
+                "Na AAS (teórica), exige-se independência: $P(X_2|X_1) = P(X_2)$.",
+                "Em populações infinitas, retirar um elemento não altera a proporção da população, mantendo a independência.",
+                "Em populações finitas sem reposição, a retirada de uma unidade altera a composição da população restante, fazendo com que $P(X_2|X_1) \\neq P(X_2)$, violando a independência estrita.",
+                "O modelo de i.i.d. é uma aproximação útil quando o tamanho da população $N$ é muito maior que o tamanho da amostra $n$ (tipicamente $n/N < 0.05$), pois a alteração nas probabilidades torna-se desprezível."
+            ],
+            "codigo_plotly": null,
+            "referencia_livro": null,
+            "resposta_numerica_esperada": null
+        },
+        {
+            "enunciado": "Uma empresa de logística possui $N=15$ veículos rastreados por GPS e deseja selecionar uma amostra de $n=4$ para auditoria de rotas. Calcule o número total de subconjuntos possíveis que podem ser formados utilizando o coeficiente binomial $\\binom{N}{n}$. Apresente o cálculo detalhado.",
+            "dica": "Utilize a fórmula $\\binom{N}{n} = \\frac{N!}{n!(N-n)!}$.",
+            "gabarito_passo_a_passo": [
+                "Identificar os parâmetros: $N=15$ e $n=4$.",
+                "Montar a fórmula: $\\binom{15}{4} = \\frac{15!}{4!(15-4)!} = \\frac{15!}{4!11!}$.",
+                "Simplificar o fatorial: $\\frac{15 \\times 14 \\times 13 \\times 12 \\times 11!}{4 \\times 3 \\times 2 \\times 1 \\times 11!}$.",
+                "Realizar a simplificação: $\\frac{15 \\times 14 \\times 13 \\times 12}{24}$.",
+                "Calcular o valor final: $\\frac{32760}{24} = 1365$."
+            ],
+            "codigo_plotly": null,
+            "referencia_livro": null,
+            "resposta_numerica_esperada": 1365.0
+        },
+        {
+            "enunciado": "Explique, de forma rigorosa e utilizando o formalismo das probabilidades, por que, na amostragem com reposição, a probabilidade de qualquer unidade $i$ ser incluída na amostra é constante e igual a $\\pi_i = n/N$. Como isso se altera, do ponto de vista conceitual, na amostragem sem reposição?",
+            "dica": "Considere o ensaio de Bernoulli para cada sorteio.",
+            "gabarito_passo_a_passo": [
+                "Na amostragem com reposição, para cada um dos $n$ sorteios, a probabilidade de selecionar a unidade $i$ é $1/N$.",
+                "Como as extrações são independentes, a probabilidade de NÃO selecionar a unidade $i$ em um sorteio é $(1 - 1/N)$.",
+                "A probabilidade de NÃO selecionar a unidade $i$ em $n$ sorteios é $(1 - 1/N)^n$.",
+                "A probabilidade de inclusão é o complemento: $\\pi_i = 1 - (1 - 1/N)^n$. Para $N$ grande, esta aproximação tende a $n/N$.",
+                "Sem reposição, a independência é quebrada: a probabilidade condicional de selecionar a unidade $i$ no sorteio $k$ depende dos resultados de $k-1$ sorteios anteriores, mas a probabilidade marginal de inclusão permanece $\\pi_i = n/N$."
+            ],
+            "codigo_plotly": null,
+            "referencia_livro": null,
+            "resposta_numerica_esperada": null
+        },
+        {
+            "enunciado": "Em uma rede de distribuição de energia com $N=800$ transformadores, deseja-se realizar uma inspeção técnica em $n=40$ unidades. Calcule a probabilidade de inclusão $\\pi_i$ de um transformador específico. Se o custo de inspeção por unidade for fixo, qual a importância da AAS na integridade dessa auditoria?",
+            "dica": "Aplique a fórmula $\\pi_i = n / N$.",
+            "gabarito_passo_a_passo": [
+                "Definir os valores: $N=800$ e $n=40$.",
+                "Calcular a probabilidade de inclusão: $\\pi_i = 40 / 800$.",
+                "Simplificar a fração: $\\pi_i = 4 / 80 = 1 / 20$.",
+                "Converter para decimal: $\\pi_i = 0.05$.",
+                "Conclusão: A AAS garante que todos os transformadores tenham chances iguais de seleção, mitigando vieses de localização geográfica que poderiam mascarar falhas no sistema."
+            ],
+            "codigo_plotly": "fig = go.Figure(); fig.add_trace(go.Scatter(x=[0, 800], y=[0.05, 0.05], mode='lines', name='$\\pi_i$', line=dict(color='#1E3A8A', width=3))); fig.update_layout(title='Probabilidade de Inclusão Constante ($\\pi_i$)', xaxis_title='ID do Transformador', yaxis_title='$\\pi_i$');",
+            "referencia_livro": null,
+            "resposta_numerica_esperada": 0.05
+        },
+        {
+            "enunciado": "Considere uma população de $N = 5000$ registros de prontuários médicos. Deseja-se extrair uma amostra de $n = 100$ prontuários. Determine o intervalo de amostragem $k$ e escreva a fórmula geral para a obtenção dos elementos da amostra $s$.",
+            "dica": "Use $k = \\lfloor N/n \\rfloor$ e a definição de conjunto $s = \\{a, a+k, a+2k, \\dots, a+(n-1)k\\}$.",
+            "gabarito_passo_a_passo": [
+                "1. Identificar os parâmetros: $N = 5000$, $n = 100$.",
+                "2. Calcular o intervalo $k$: $k = \\lfloor 5000 / 100 \\rfloor = 50$.",
+                "3. Definir a amostra: $s = \\{a, a+50, a+100, \\dots, a+4950\\}$, onde $1 \\le a \\le 50$."
+            ],
+            "codigo_plotly": "fig = go.Figure(); fig.add_trace(go.Bar(x=['Intervalo k'], y=[50], marker_color='#10B981')); fig.update_layout(title='<b>Intervalo de Amostragem</b>', yaxis=dict(title='Valor de k', fixedrange=True), template='plotly_white')",
+            "referencia_livro": null,
+            "resposta_numerica_esperada": 50.0
+        },
+        {
+            "enunciado": "Explique, sob a ótica da teoria da amostragem, por que a escolha aleatória do ponto de partida $a$ (onde $1 \\le a \\le k$) é fundamental para garantir a validade estatística da amostra sistemática.",
+            "dica": "Considere a necessidade de garantir que cada elemento da população tenha uma probabilidade de seleção conhecida.",
+            "gabarito_passo_a_passo": [
+                "1. Na amostragem sistemática, o primeiro elemento $a$ é escolhido aleatoriamente com probabilidade $1/k$.",
+                "2. Uma vez escolhido $a$, todos os demais elementos ficam determinados, mas a probabilidade de qualquer unidade $i$ da população ser selecionada permanece $1/k$ (ou $n/N$).",
+                "3. Sem a aleatoriedade inicial no ponto de partida, o método seria determinístico e não probabilístico, impedindo inferências estatísticas válidas sobre a população."
+            ],
+            "codigo_plotly": null,
+            "referencia_livro": null,
+            "resposta_numerica_esperada": null
+        },
+        {
+            "enunciado": "Um sensor de IoT coleta temperatura a cada minuto. O gestor decide coletar uma amostra de 1 dia de dados (1440 registros) em um período de 1 mês ($N = 43200$ minutos). Se o gestor definir um intervalo $k = 30$, calcule o tamanho da amostra $n$ que ele irá obter e discuta o impacto dessa escolha se houver ciclos de temperatura (ex: dia/noite) sincronizados com esse intervalo.",
+            "dica": "Use $k = \\lfloor N/n \\rfloor$ para encontrar $n$. Lembre-se que $k=30$ implica amostrar a cada 30 minutos.",
+            "gabarito_passo_a_passo": [
+                "1. Dado $N = 43200$ e $k = 30$, temos $30 = \\lfloor 43200 / n \\rfloor$.",
+                "2. Logo, $n = 43200 / 30 = 1440$ registros.",
+                "3. Análise crítica: Como o intervalo é de 30 minutos, se a temperatura variar em ciclos de 30 ou 60 minutos, haverá viés sistemático pois a amostra capturará apenas um ponto da fase da oscilação térmica, não representando a variabilidade real."
+            ],
+            "codigo_plotly": "fig = go.Figure(); fig.add_trace(go.Scatter(x=[i*30 for i in range(10)], y=[25, 26, 27, 26, 25, 24, 23, 24, 25, 26], mode='lines+markers', name='Ciclo Amostrado', line=dict(color='#1E3A8A'))); fig.update_layout(title='<b>Amostragem em Ciclos Térmicos</b>', xaxis=dict(title='Minutos', fixedrange=True), yaxis=dict(title='Temp', fixedrange=True), template='plotly_white')",
+            "referencia_livro": null,
+            "resposta_numerica_esperada": 1440.0
+        },
+        {
+            "enunciado": "Uma auditoria financeira deseja analisar o valor de $N = 2000$ faturas. O auditor escolhe uma amostra de $n = 50$ faturas. Calcule a variância da média amostral para um método de Amostragem Aleatória Simples (AAS), assumindo uma variância populacional $\\sigma^2 = 400$. Em seguida, determine qual deveria ser o valor da correlação intraclasse $\\rho_w$ para que a Amostragem Sistemática apresentasse uma variância igual à da AAS. Justifique sua resposta matematicamente.",
+            "dica": "Iguale as fórmulas das variâncias: $\\frac{\\sigma^2}{n} \\left( \\frac{N-n}{N-1} \\right) = \\frac{\\sigma^2}{n} [1 + (n-1)\\rho_w]$ e resolva para $\\rho_w$.",
+            "gabarito_passo_a_passo": [
+                "1. Identificação dos dados: $N = 2000$, $n = 50$, $\\sigma^2 = 400$.",
+                "2. Cálculo da variância AAS: $Var(\\bar{X}) = \\frac{400}{50} \\left( \\frac{2000-50}{2000-1} \\right) = 8 \\times \\frac{1950}{1999} \\approx 8 \\times 0.975487 \\approx 7.8039$.",
+                "3. Igualando as variâncias: $\\frac{\\sigma^2}{n} \\left( \\frac{N-n}{N-1} \\right) = \\frac{\\sigma^2}{n} [1 + (n-1)\\rho_w]$.",
+                "4. Simplificação: $\\frac{N-n}{N-1} = 1 + (n-1)\\rho_w$.",
+                "5. Isolando $\\rho_w$: $(n-1)\\rho_w = \\frac{N-n}{N-1} - 1 = \\frac{N-n - (N-1)}{N-1} = \\frac{1-n}{N-1}$.",
+                "6. Finalização: $\\rho_w = \\frac{1-n}{N-1} \\times \\frac{1}{n-1} = \\frac{-(n-1)}{(N-1)(n-1)} = -\\frac{1}{N-1}$.",
+                "7. Substituição: $\\rho_w = -\\frac{1}{2000-1} = -\\frac{1}{1999} \\approx -0.00050025$."
+            ],
+            "codigo_plotly": null,
+            "referencia_livro": null,
+            "resposta_numerica_esperada": -0.0005
+        },
+        {
+            "enunciado": "Explique, sob a ótica da teoria da amostragem, como a ordenação da população influencia o desempenho da Amostragem Sistemática frente à AAS. Em particular, discuta o que acontece quando a correlação intraclasse $\\rho_w$ é positiva, negativa ou próxima de zero, e qual a consequência prática disso para a confiabilidade da inferência.",
+            "dica": "Relacione a magnitude de $\\rho_w$ com a diversidade dos elementos dentro de uma mesma amostra sistemática.",
+            "gabarito_passo_a_passo": [
+                "1. A variância do estimador da média na Amostragem Sistemática é $Var(\\bar{X}_{sys}) = \\frac{\\sigma^2}{n} [1 + (n-1)\\rho_w]$.",
+                "2. Se $\\rho_w > 0$, os elementos da amostra sistemática são positivamente correlacionados (semelhantes), o que aumenta a variância da média, tornando a amostra menos informativa que a AAS.",
+                "3. Se $\\rho_w < 0$, os elementos da amostra são negativamente correlacionados (diversos), o que reduz a variância, tornando a amostra mais precisa que a AAS.",
+                "4. Se $\\rho_w \\approx 0$, os elementos são praticamente independentes, e a Amostragem Sistemática se comporta como a AAS, sendo uma alternativa eficiente pela simplicidade operacional.",
+                "5. Conclusão: A confiabilidade depende da ordenação. Se a lista populacional possuir tendência ou periodicidade, a amostra sistemática pode falhar, tornando a inferência pouco robusta."
+            ],
+            "codigo_plotly": null,
+            "referencia_livro": null,
+            "resposta_numerica_esperada": null
+        },
+        {
+            "enunciado": "Considere que você precisa extrair uma amostra sistemática de $n = 200$ elementos de uma população com $N = 10.000$ registros. Determine o passo de amostragem $k$. Se o primeiro elemento sorteado for $r = 35$, liste quais serão os índices dos quatro primeiros elementos da amostra. Discuta, ainda, o risco de viés se o banco de dados estiver ordenado por uma variável categórica que se repete a cada 50 registros.",
+            "dica": "O passo é dado por $k = N/n$. Os elementos são $r, r+k, r+2k, r+3k$.",
+            "gabarito_passo_a_passo": [
+                "1. Cálculo do passo: $k = N / n = 10000 / 200 = 50$.",
+                "2. Identificação da sequência: $r = 35$. Os elementos são $35, 35+50, 35+2\\times 50, 35+3\\times 50$.",
+                "3. Valores: $35, 85, 135, 185$.",
+                "4. Análise de risco: Como o passo $k=50$ coincide com a repetição da variável categórica na população, todos os elementos da amostra (35, 85, 135, 185, ...) possuirão a mesma categoria da variável de ordenação.",
+                "5. Conclusão: A amostra não será representativa, pois irá super-representar uma única categoria, induzindo um viés extremo e invalidando qualquer estimativa populacional."
+            ],
+            "codigo_plotly": "fig = go.Figure()\nfig.add_trace(go.Scatter(x=[35, 85, 135, 185], y=[1, 1, 1, 1], mode='markers', marker=dict(size=15, color='#1E3A8A'), name='Elementos Amostrados'))\nfig.update_layout(template='plotly_white', title='Seleção de Elementos (Amostragem Sistemática)', xaxis_title='Índice na População', yaxis=dict(showticklabels=False), height=200)",
+            "referencia_livro": null,
+            "resposta_numerica_esperada": 50.0
         }
     ]
 }

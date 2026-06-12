@@ -1,0 +1,113 @@
+{
+    "status": "erro",
+    "timestamp_inicio": "2026-06-11 14:56:34",
+    "tema": "Unidade 7 - Tópico 7.1: Diagnóstico e bondade do ajuste: Análise de resíduos",
+    "professor": "Luca",
+    "disciplina": "MATD41",
+    "tempo_total_segundos": 884.55,
+    "etapas": {
+        "1_indexacao_rag": {
+            "descricao": "Indexação dos Materiais de Apoio (RAG Pessoal)",
+            "status": "pulado",
+            "duracao_segundos": 0.0
+        },
+        "2_roteirista": {
+            "descricao": "Agente 1: Roteirista (Alinhamento de Escopo e Trilha)",
+            "status": "sucesso",
+            "duracao_segundos": 11.39
+        },
+        "3_escrita_revisao": {
+            "descricao": "Agente 2 + 2.5: Escritor & Revisor (Loop de Revisão Ativa)",
+            "status": "sucesso",
+            "duracao_segundos": 286.81,
+            "subtopicos": [
+                {
+                    "titulo": "A Natureza Teórica e Decomposição dos Resíduos no Modelo Linear",
+                    "tentativas": 2,
+                    "reprovacoes": 1,
+                    "feedbacks": [
+                        "O exemplo canônico apresenta um erro de cálculo algébrico na determinação do vetor de estimativas $\\hat{\\beta}$. Ao realizar o produto matricial $\\hat{\\beta} = (X^T X)^{-1} X^T Y$, o cálculo correto da segunda coordenada é $\\hat{\\beta}_1 = (-0.5 \\times 14) + (1 \\times 5) = -7 + 5 = -2$. O documento apresenta incorretamente $-2.5$. Este erro compromete a precisão dos resultados subsequentes, afetando o vetor de valores ajustados $\\hat{Y}$, o vetor de resíduos $e$ e, consequentemente, o valor da soma dos quadrados dos resíduos (SQRes). Por favor, refaça o cálculo do exemplo numérico para garantir a integridade dos dados."
+                    ],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 83.09,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Propriedades Estatísticas e Estrutura de Covariância dos Resíduos",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 45.16,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Transformações Normativas: Resíduos Padronizados e Studentizados",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 42.66,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Investigação de Pressupostos: Homocedasticidade e Independência",
+                    "tentativas": 2,
+                    "reprovacoes": 1,
+                    "feedbacks": [
+                        "O conteúdo apresenta falhas críticas de notação matemática e rigor científico, violando estritamente as diretrizes da plataforma. (1) Notação Incorreta: O símbolo ̃θ foi utilizado indiscriminadamente para representar variância populacional (que deve ser σ^2), parâmetros de regressão (que devem ser β) e matrizes de variância-covariância. O uso de um símbolo genérico compromete gravemente a precisão da definição formal. (2) Rigor Algébrico: A dedução formal mistura notação matricial de forma inconsistente com a tabela de diretrizes fornecida. (3) Correção Obrigatória: É necessário refazer o formalismo utilizando β para os coeficientes de regressão, σ^2 para variâncias, e definir a matriz de variância-covariância usando a notação de matriz de covariância (ex: Σ ou V), eliminando a ambiguidade causada pelo uso de θ."
+                    ],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 74.05,
+                    "aprovado": true
+                },
+                {
+                    "titulo": "Diagnóstico de Não-Linearidade e Padrões Sistêmicos de Erro",
+                    "tentativas": 1,
+                    "reprovacoes": 0,
+                    "feedbacks": [],
+                    "erros_api": {
+                        "429": 0,
+                        "503": 0,
+                        "outros": 0
+                    },
+                    "tempo_segundos": 41.86,
+                    "aprovado": true
+                }
+            ]
+        },
+        "4_lapidacao_editorial": {
+            "descricao": "Agente 3.5: Editor-Chefe (Unificação e Coerência Global)",
+            "status": "sucesso",
+            "duracao_segundos": 26.79
+        },
+        "5_expansao_prosa": {
+            "descricao": "Agente 3.75: Construtor de Prosa (Expansão Exaustiva de Livro)",
+            "status": "sucesso",
+            "duracao_segundos": 71.7
+        },
+        "6_caderno_exercicios": {
+            "descricao": "Agente 3: Caderno de Exercícios (Questões Fechadas e Abertas)",
+            "status": "sucesso",
+            "duracao_segundos": 130.12
+        }
+    },
+    "erro_mensagem": "O script gerado contém erros de execução (ex: Plotly/Pandas) e foi removido para evitar falhas no carregamento. Detalhes: ValueError: invalid __array_struct__",
+    "timestamp_fim": "2026-06-11 15:11:18"
+}
